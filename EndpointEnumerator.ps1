@@ -250,62 +250,64 @@ Get-CimInstance
                 
                 # to add: Windows Firewall Enabled, DomainName, Windows Automatic updates set NBT over TCP/IP disabled on all interfaces, account lockout, local password policy , Test-ComputerSecureChannel?, 
                 # to double check: the IP address is currently looking for the first IPv4 match, will that work if they are on a VPN/different adapater? mmm
-                $PassPol = Get-PassPol -ErrorAction SilentlyContinue
-                Write-Host "Password-Policy:$PassPol"
                 $ipAddress = $(ipconfig | where {$_ -match 'IPv4.+\s(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})' } | out-null; $Matches[1])
-                Write-Host "IP:$ipAddress"
+                # Write-Host "${computerName}:${ipAddress}:IP:$ipAddress"
                 $computerName = $env:COMPUTERNAME
-                Write-Host "ComputerName:$computerName"
+                Write-Host "+++++++++++++++++ ComputerName:$computerName +++++++++++++++++ "
+                
+                $PassPol = Get-PassPol -ErrorAction SilentlyContinue
+                Write-Host "${computerName}:${ipAddress}:Password-Policy:$PassPol"
+
                 $firewallStatusDomain = (Get-NetFirewallProfile -ErrorAction SilentlyContinue | select Name,Enabled | where Name -in "Domain" ).enabled 
-                Write-Host "FirewallStatusDomain:$firewallStatusDomain"
+                Write-Host "${computerName}:${ipAddress}:FirewallStatusDomain:$firewallStatusDomain"
                 $firewallStatusPrivate = (Get-NetFirewallProfile -ErrorAction SilentlyContinue | select Name,Enabled | where Name -in "Private" ).enabled
-                Write-Host "FirewallStatusPrivate:$firewallStatusPrivate"
+                Write-Host "${computerName}:${ipAddress}:FirewallStatusPrivate:$firewallStatusPrivate"
                 $firewallStatusPublic = (Get-NetFirewallProfile | select Name,Enabled | where Name -in "Public").enabled
-                Write-Host "FirewallStatusPublic:$firewallStatusPublic"
+                Write-Host "${computerName}:${ipAddress}:FirewallStatusPublic:$firewallStatusPublic"
                 $smbV1Enable = (Get-SmbServerConfiguration -ErrorAction SilentlyContinue | select EnableSMB1Protocol).EnableSMB1Protocol
-                Write-Host "SMBv1:$smbV1Enable"
+                Write-Host "${computerName}:${ipAddress}:SMBv1:$smbV1Enable"
                 $smbEncryptionEnabled = (Get-SmbServerConfiguration -ErrorAction SilentlyContinue | select EncryptData).EncryptData
-                Write-Host "SMBEncryptionEnabled:$smbEncryptionEnabled"
+                Write-Host "${computerName}:${ipAddress}:SMBEncryptionEnabled:$smbEncryptionEnabled"
                 $smbSigningEnabled = (Get-SmbServerConfiguration -ErrorAction SilentlyContinue | select RequireSecuritySignature).requiresecuritysignature
-                Write-Host "SMBSigningEnabled:$smbSigningEnabled"
+                Write-Host "${computerName}:${ipAddress}:SMBSigningEnabled:$smbSigningEnabled"
                 $llmnrstatus = (Get-ItemProperty -path 'HKLM:\Software\policies\Microsoft\Windows NT\DNSClient' -ErrorAction SilentlyContinue).EnableMulticast
-                Write-Host "LLMNRStatus:$llmnrstatus"
+                Write-Host "${computerName}:${ipAddress}:LLMNRStatus:$llmnrstatus"
                 $ipv6Enabled = Get-NetIPInterface -ErrorAction SilentlyContinue | where AddressFamily -in "IPv6" | select DHCP | where DHCP -Contains Enabled; If ($ipv6Enabled -ne $empty) {$ipv6EnabledStatus = 1} Else {$ipv6EnabledStatus = 0};
-                Write-Host "IPv6Enabled:$ipv6Enabled"
+                Write-Host "${computerName}:${ipAddress}:IPv6Enabled:$ipv6Enabled"
                 $ldapSigningEnabled = (Get-ItemProperty -path 'HKLM:\SYSTEM\CurrentControlSet\Services\LDAP' -ErrorAction SilentlyContinue).LdapclientIntegrity 
-                Write-Host "LDAPSigningEnabled:$ldapSigningEnabled"
+                Write-Host "${computerName}:${ipAddress}:LDAPSigningEnabled:$ldapSigningEnabled"
                 $lastSecurityUpdate = (Get-HotFix -Description Security* -ErrorAction SilentlyContinue | Sort-Object -Property InstalledOn)[-1].installedon
-                Write-Host "LastSecurityUpdate:$lastSecurityUpdate"
+                Write-Host "${computerName}:${ipAddress}:LastSecurityUpdate:$lastSecurityUpdate"
                 $localAdminAccountEnabled = (Get-LocalUser -ErrorAction SilentlyContinue | select Name,Enabled | where Name -in "Administrator").Enabled
-                Write-Host "LocalAdminAccountEnabled:$localAdminAccountEnabled"
+                Write-Host "${computerName}:${ipAddress}:LocalAdminAccountEnabled:$localAdminAccountEnabled"
                 $localGuestAccountEnabled = (Get-LocalUser -ErrorAction SilentlyContinue | select Name,Enabled | where Name -in "Guest").enabled
-                Write-Host "LocalGuestAccountEnabled:$localGuestAccountEnabled"
+                Write-Host "${computerName}:${ipAddress}:LocalGuestAccountEnabled:$localGuestAccountEnabled"
                 $defaultGateway = (Get-NetIPConfiguration -ErrorAction SilentlyContinue | Foreach IPv4DefaultGateway).nexthop
-                Write-Host "DefaultGateway:$defaultGateway"
+                Write-Host "${computerName}:${ipAddress}:DefaultGateway:$defaultGateway"
                 $windowsVersion = ([environment]::OSVersion.Version).build
-                Write-Host "WindowsVersion:$windowsVersion"
+                Write-Host "${computerName}:${ipAddress}:WindowsVersion:$windowsVersion"
                 $windowsVersionMajor = ([environment]::OSVersion.Version).Major
-                Write-Host "WindowsVersionMajor:$windowsVersionMajor"
+                Write-Host "${computerName}:${ipAddress}:WindowsVersionMajor:$windowsVersionMajor"
                 $windowsEdition = (Get-WmiObject Win32_OperatingSystem -ErrorAction SilentlyContinue).Caption
-                Write-Host "WindowsEdition:$windowsEdition"
+                Write-Host "${computerName}:${ipAddress}:WindowsEdition:$windowsEdition"
                 $unsupportedOS = 10240,10586,14393,15063,16299,17134,17763,18362,18363
                 $osSupported = $OSVersion -notin $unsupportedOS
-                Write-Host "OSSupported:$osSupported"
+                Write-Host "${computerName}:${ipAddress}:OSSupported:$osSupported"
                 $avName = (Get-AntiVirusProduct -ErrorAction SilentlyContinue).'Name'        
-                Write-Host "AVName:$avName"
+                Write-Host "${computerName}:${ipAddress}:AVName:$avName"
                 $avRealTimeProtectStatus = (Get-AntiVirusProduct -ErrorAction SilentlyContinue).'Real-Time Protection Status'
-                Write-Host "AVRealTimeProtectStatus:$avRealTimeProtectStatus"
+                Write-Host "${computerName}:${ipAddress}:AVRealTimeProtectStatus:$avRealTimeProtectStatus"
                 $avDefinitions = (Get-AntiVirusProduct -ErrorAction SilentlyContinue).'Definition Status' 
             
-                Write-Host "AVDefinition:$avDefinitions"
+                Write-Host "${computerName}:${ipAddress}:AVDefinition:$avDefinitions"
                 $minPassLength = $PassPol.'Minimum Password Length (Chars)'
-                Write-Host "MinPassLength:$minPassLength"
+                Write-Host "${computerName}:${ipAddress}:MinPassLength:$minPassLength"
                 $passHistoryVar = $PassPol.'Enforce Password History (Passwords remembered)'
-                Write-Host "MinPassHistory:$passHistoryVar"
+                Write-Host "${computerName}:${ipAddress}:MinPassHistory:$passHistoryVar"
                 $acctLockoutThresholdVar = $PassPol.'Account Lockout Threshold (Invalid logon attempts)'
-                Write-Host "AcctLockoutThreshold:$acctLockoutThresholdVar"
+                Write-Host "${computerName}:${ipAddress}:AcctLockoutThreshold:$acctLockoutThresholdVar"
                 $acctLockoutDurationVar = $PassPol.'Account Lockout Duration (Minutes)'
-                Write-Host "AccountLockoutDuration:$acctLockoutDurationVar"
+                Write-Host "${computerName}:${ipAddress}:AccountLockoutDuration:$acctLockoutDurationVar"
                 
                  
 # }
