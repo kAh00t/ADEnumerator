@@ -250,52 +250,52 @@ Get-CimInstance
                 
                 # to add: Windows Firewall Enabled, DomainName, Windows Automatic updates set NBT over TCP/IP disabled on all interfaces, account lockout, local password policy , Test-ComputerSecureChannel?, 
                 # to double check: the IP address is currently looking for the first IPv4 match, will that work if they are on a VPN/different adapater? mmm
-                $PassPol = Get-PassPol
+                $PassPol = Get-PassPol -ErrorAction SilentlyContinue
                 Write-Host "Password-Policy:$PassPol"
                 $ipAddress = $(ipconfig | where {$_ -match 'IPv4.+\s(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})' } | out-null; $Matches[1])
                 Write-Host "IP:$ipAddress"
                 $computerName = $env:COMPUTERNAME
                 Write-Host "ComputerName:$computerName"
-                $firewallStatusDomain = (Get-NetFirewallProfile | select Name,Enabled | where Name -in "Domain" ).enabled 
+                $firewallStatusDomain = (Get-NetFirewallProfile -ErrorAction SilentlyContinue | select Name,Enabled | where Name -in "Domain" ).enabled 
                 Write-Host "FirewallStatusDomain:$firewallStatusDomain"
-                $firewallStatusPrivate = (Get-NetFirewallProfile | select Name,Enabled | where Name -in "Private" ).enabled
+                $firewallStatusPrivate = (Get-NetFirewallProfile -ErrorAction SilentlyContinue | select Name,Enabled | where Name -in "Private" ).enabled
                 Write-Host "FirewallStatusPrivate:$firewallStatusPrivate"
                 $firewallStatusPublic = (Get-NetFirewallProfile | select Name,Enabled | where Name -in "Public").enabled
                 Write-Host "FirewallStatusPublic:$firewallStatusPublic"
-                $smbV1Enable = (Get-SmbServerConfiguration | select EnableSMB1Protocol).EnableSMB1Protocol
+                $smbV1Enable = (Get-SmbServerConfiguration -ErrorAction SilentlyContinue | select EnableSMB1Protocol).EnableSMB1Protocol
                 Write-Host "SMBv1:$smbV1Enable"
-                $smbEncryptionEnabled = (Get-SmbServerConfiguration | select EncryptData).EncryptData
+                $smbEncryptionEnabled = (Get-SmbServerConfiguration -ErrorAction SilentlyContinue | select EncryptData).EncryptData
                 Write-Host "SMBEncryptionEnabled:$smbEncryptionEnabled"
-                $smbSigningEnabled = (Get-SmbServerConfiguration | select RequireSecuritySignature).requiresecuritysignature
+                $smbSigningEnabled = (Get-SmbServerConfiguration -ErrorAction SilentlyContinue | select RequireSecuritySignature).requiresecuritysignature
                 Write-Host "SMBSigningEnabled:$smbSigningEnabled"
                 $llmnrstatus = (Get-ItemProperty -path 'HKLM:\Software\policies\Microsoft\Windows NT\DNSClient' -ErrorAction SilentlyContinue).EnableMulticast
                 Write-Host "LLMNRStatus:$llmnrstatus"
-                $ipv6Enabled = Get-NetIPInterface | where AddressFamily -in "IPv6" | select DHCP | where DHCP -Contains Enabled; If ($ipv6Enabled -ne $empty) {$ipv6EnabledStatus = 1} Else {$ipv6EnabledStatus = 0};
+                $ipv6Enabled = Get-NetIPInterface -ErrorAction SilentlyContinue | where AddressFamily -in "IPv6" | select DHCP | where DHCP -Contains Enabled; If ($ipv6Enabled -ne $empty) {$ipv6EnabledStatus = 1} Else {$ipv6EnabledStatus = 0};
                 Write-Host "IPv6Enabled:$ipv6Enabled"
-                $ldapSigningEnabled = (Get-ItemProperty -path 'HKLM:\SYSTEM\CurrentControlSet\Services\LDAP').LdapclientIntegrity 
+                $ldapSigningEnabled = (Get-ItemProperty -path 'HKLM:\SYSTEM\CurrentControlSet\Services\LDAP' -ErrorAction SilentlyContinue).LdapclientIntegrity 
                 Write-Host "LDAPSigningEnabled:$ldapSigningEnabled"
-                $lastSecurityUpdate = (Get-HotFix -Description Security* | Sort-Object -Property InstalledOn)[-1].installedon
+                $lastSecurityUpdate = (Get-HotFix -Description Security* -ErrorAction SilentlyContinue | Sort-Object -Property InstalledOn)[-1].installedon
                 Write-Host "LastSecurityUpdate:$lastSecurityUpdate"
-                $localAdminAccountEnabled = (Get-LocalUser | select Name,Enabled | where Name -in "Administrator").Enabled
+                $localAdminAccountEnabled = (Get-LocalUser -ErrorAction SilentlyContinue | select Name,Enabled | where Name -in "Administrator").Enabled
                 Write-Host "LocalAdminAccountEnabled:$localAdminAccountEnabled"
-                $localGuestAccountEnabled = (Get-LocalUser | select Name,Enabled | where Name -in "Guest").enabled
+                $localGuestAccountEnabled = (Get-LocalUser -ErrorAction SilentlyContinue | select Name,Enabled | where Name -in "Guest").enabled
                 Write-Host "LocalGuestAccountEnabled:$localGuestAccountEnabled"
-                $defaultGateway = (Get-NetIPConfiguration | Foreach IPv4DefaultGateway).nexthop
+                $defaultGateway = (Get-NetIPConfiguration -ErrorAction SilentlyContinue | Foreach IPv4DefaultGateway).nexthop
                 Write-Host "DefaultGateway:$defaultGateway"
                 $windowsVersion = ([environment]::OSVersion.Version).build
                 Write-Host "WindowsVersion:$windowsVersion"
                 $windowsVersionMajor = ([environment]::OSVersion.Version).Major
                 Write-Host "WindowsVersionMajor:$windowsVersionMajor"
-                $windowsEdition = (Get-WmiObject Win32_OperatingSystem).Caption
+                $windowsEdition = (Get-WmiObject Win32_OperatingSystem -ErrorAction SilentlyContinue).Caption
                 Write-Host "WindowsEdition:$windowsEdition"
                 $unsupportedOS = 10240,10586,14393,15063,16299,17134,17763,18362,18363
                 $osSupported = $OSVersion -notin $unsupportedOS
                 Write-Host "OSSupported:$osSupported"
-                $avName = (Get-AntiVirusProduct).'Name'        
+                $avName = (Get-AntiVirusProduct -ErrorAction SilentlyContinue).'Name'        
                 Write-Host "AVName:$avName"
-                $avRealTimeProtectStatus = (Get-AntiVirusProduct).'Real-Time Protection Status'
+                $avRealTimeProtectStatus = (Get-AntiVirusProduct -ErrorAction SilentlyContinue).'Real-Time Protection Status'
                 Write-Host "AVRealTimeProtectStatus:$avRealTimeProtectStatus"
-                $avDefinitions = (Get-AntiVirusProduct).'Definition Status' 
+                $avDefinitions = (Get-AntiVirusProduct -ErrorAction SilentlyContinue).'Definition Status' 
             
                 Write-Host "AVDefinition:$avDefinitions"
                 $minPassLength = $PassPol.'Minimum Password Length (Chars)'
