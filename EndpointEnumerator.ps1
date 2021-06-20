@@ -142,7 +142,7 @@ function EnumerateEachMachine
                 Write-Host "${CurrentDomain}:${computerName}:${ipAddress}:AccountLockoutDuration:$acctLockoutDurationVar"
                 #$gpresultoutput = gpresult /SCOPE USER /R
                 #Write-Host "${computerName}:${ipAddress}:GPResultOutput:$gpresultoutput"
-                $LocalAdmins=(Get-LocalGroupMember -Group "Administrators").Name
+                $LocalAdmins=(Get-LocalGroupMember -Group "Administrators" -ErrorAction SilentlyContinue).Name
                 Write-Host "${CurrentDomain}:${computerName}:${ipAddress}:LocalAdmins:$LocalAdmins"
                 $CurrentLoggedInUsers=query user /server:$SERVER
                 Write-Host "${CurrentDomain}:${computerName}:${ipAddress}:CurrentLoggedInUsers:$CurrentLoggedInUsers"
