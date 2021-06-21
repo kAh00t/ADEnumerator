@@ -1,6 +1,34 @@
+#  ███████╗███╗   ██╗██████╗ ██████╗  ██████╗ ██╗███╗   ██╗████████╗██╗  ██╗███████╗ █████╗ ██╗  ████████╗██╗  ██╗ ██████╗██╗  ██╗███████╗ ██████╗██╗  ██╗
+#  ██╔════╝████╗  ██║██╔══██╗██╔══██╗██╔═══██╗██║████╗  ██║╚══██╔══╝██║  ██║██╔════╝██╔══██╗██║  ╚══██╔══╝██║  ██║██╔════╝██║  ██║██╔════╝██╔════╝██║ ██╔╝
+#  █████╗  ██╔██╗ ██║██║  ██║██████╔╝██║   ██║██║██╔██╗ ██║   ██║   ███████║█████╗  ███████║██║     ██║   ███████║██║     ███████║█████╗  ██║     █████╔╝ 
+#  ██╔══╝  ██║╚██╗██║██║  ██║██╔═══╝ ██║   ██║██║██║╚██╗██║   ██║   ██╔══██║██╔══╝  ██╔══██║██║     ██║   ██╔══██║██║     ██╔══██║██╔══╝  ██║     ██╔═██╗ 
+#  ███████╗██║ ╚████║██████╔╝██║     ╚██████╔╝██║██║ ╚████║   ██║   ██║  ██║███████╗██║  ██║███████╗██║   ██║  ██║╚██████╗██║  ██║███████╗╚██████╗██║  ██╗
+#  ╚══════╝╚═╝  ╚═══╝╚═════╝ ╚═╝      ╚═════╝ ╚═╝╚═╝  ╚═══╝   ╚═╝   ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚══════╝╚═╝   ╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝╚══════╝ ╚═════╝╚═╝  ╚═╝
+#                                                                                                                                                         
+
+# Version : 0.1
+# Created by: David Manuel
+# Date: 21/06/2021 
+# Description: Windows AD connected/domain joined endpoint enumerator. Output of cme needs filters (commands below) and use : for delimeter in Excel to go over data. 
+
+# Useage: 
+# Launch command directly in memory, requires outbound 443, might trigger AV lol 
+# powershell.exe -exec Bypass -C "IEX (New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/kAh00t/ADEnumerator/main/EndpointEnumerator.ps1')"
+# OR
+# crackmapexec smb 192.168.123.0/24 -u 'USERNAME' -p 'PASSWORD' -x "powershell.exe -exec Bypass -C \"IEX (New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/kAh00t/ADEnumerator/main/EndpointEnumerator.ps1')\"" | tee cmeoutput.txt
+
+# Parse and remove weird encoding string issue I've not worked out 
+# cat cmeoutput.txt | grep ">>>" | cut -d ">" -f 4 | sed -e 's/\[0m//' >> excel-parsed.csv
+
+# Open the parsed file, remember to choose : as delimeter. 
+# libreoffice excel-parsed.csv 
+
+
+# Main Function 
 function EnumerateEachMachine
 {
     
+        # AV script, didn't write this myself, not sure if it works, will probably remove. 
         function Get-AntiVirusProduct {
         [CmdletBinding()]
         param (
@@ -48,6 +76,7 @@ function EnumerateEachMachine
         Return $ret
         }
       
+        # Get Password policy script, again - somebody else wrote this, I'll need to find the original to reference here 
         function Get-PassPol
                 {
 	                $domain = [ADSI]"WinNT://$env:userdomain"
@@ -64,7 +93,8 @@ function EnumerateEachMachine
                     
                 }
                 
-        ######################## Variables ##############################
+
+                ######################## Variables ##############################
                 $windowsVersion = ([environment]::OSVersion.Version).build
                 $windowsEdition = (Get-WmiObject Win32_OperatingSystem -ErrorAction SilentlyContinue).Caption
                 # to add: Windows Firewall Enabled, DomainName, Windows Automatic updates set NBT over TCP/IP disabled on all interfaces, account lockout, local password policy , Test-ComputerSecureChannel?, 
@@ -79,86 +109,99 @@ function EnumerateEachMachine
                 #Write-Host "${CurrentDomain}:${computerName}:${ipAddress}:CurrentDomain:$CurrentDomain"
 
                 $PassPol = Get-PassPol -ErrorAction SilentlyContinue
-                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:Password-Policy:$PassPol"
+                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:Windows:Password-Policy:$PassPol"
 
                 $FWService = (Get-Service | ?{$_.Name -eq "mpssvc"})
                 $FWService | %{If($_.Status -eq "Running"){$FirewallServiceRunning="True"}Else{$FirewallServiceRunning="False"}
-                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:FirewallServiceRunning:$FirewallServiceRunning"
+                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:Firewall:FirewallServiceRunning:$FirewallServiceRunning"
 
                 $firewallStatusDomain = (Get-NetFirewallProfile -ErrorAction SilentlyContinue | select Name,Enabled | where Name -in "Domain" ).enabled 
-                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:FirewallStatusDomain:$firewallStatusDomain"
+                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:Firewall:FirewallStatusDomain:$firewallStatusDomain"
                 $firewallStatusPrivate = (Get-NetFirewallProfile -ErrorAction SilentlyContinue | select Name,Enabled | where Name -in "Private" ).enabled
-                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:FirewallStatusPrivate:$firewallStatusPrivate"
+                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:Firewall:FirewallStatusPrivate:$firewallStatusPrivate"
                 $firewallStatusPublic = (Get-NetFirewallProfile | select Name,Enabled | where Name -in "Public").enabled
-                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:FirewallStatusPublic:$firewallStatusPublic"
+                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:Firewall:FirewallStatusPublic:$firewallStatusPublic"
                 $smbV1Enable = (Get-SmbServerConfiguration -ErrorAction SilentlyContinue | select EnableSMB1Protocol).EnableSMB1Protocol
-                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:SMBv1:$smbV1Enable"
+                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:SMB:SMBv1:$smbV1Enable"
                 $smbEncryptionEnabled = (Get-SmbServerConfiguration -ErrorAction SilentlyContinue | select EncryptData).EncryptData
-                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:SMBEncryptionEnabled:$smbEncryptionEnabled"
+                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:SMB:SMBEncryptionEnabled:$smbEncryptionEnabled"
                 $smbSigningEnabled = (Get-SmbServerConfiguration -ErrorAction SilentlyContinue | select RequireSecuritySignature).requiresecuritysignature
-                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:SMBSigningEnabled:$smbSigningEnabled"
+                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:SMBLSMBSigningEnabled:$smbSigningEnabled"
                 $llmnrstatus = (Get-ItemProperty -path 'HKLM:\Software\policies\Microsoft\Windows NT\DNSClient' -ErrorAction SilentlyContinue).EnableMulticast
-                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:LLMNRStatus:$llmnrstatus"
+                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:LLMNR:LLMNR_Status:$llmnrstatus"
                 $ipv6Enabled = Get-NetIPInterface -ErrorAction SilentlyContinue | where AddressFamily -in "IPv6" | select DHCP | where DHCP -Contains Enabled; If ($ipv6Enabled -ne $empty) {$ipv6EnabledStatus = 1} Else {$ipv6EnabledStatus = 0};
-                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:IPv6Enabled:$ipv6Enabled"
+                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:IP:IPv6_Enabled:$ipv6Enabled"
                 $ldapSigningEnabled = (Get-ItemProperty -path 'HKLM:\SYSTEM\CurrentControlSet\Services\LDAP' -ErrorAction SilentlyContinue).LdapclientIntegrity 
-                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:LDAPSigningEnabled:$ldapSigningEnabled"
+                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:LDAP:LDAPSigningEnabled:$ldapSigningEnabled"
                 $lastSecurityUpdate = (Get-HotFix -Description Security* -ErrorAction SilentlyContinue | Sort-Object -Property InstalledOn)[-1].installedon
-                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:LastSecurityUpdate:$lastSecurityUpdate"
+                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:Windows:LastSecurityUpdate:$lastSecurityUpdate"
                 $localAdminAccountEnabled = (Get-LocalUser -ErrorAction SilentlyContinue | select Name,Enabled | where Name -in "Administrator").Enabled
-                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:LocalAdminAccountEnabled:$localAdminAccountEnabled"
+                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:Windows:LocalAdminAccountEnabled:$localAdminAccountEnabled"
                 $localGuestAccountEnabled = (Get-LocalUser -ErrorAction SilentlyContinue | select Name,Enabled | where Name -in "Guest").enabled
-                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:LocalGuestAccountEnabled:$localGuestAccountEnabled"
+                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:Windows:LocalGuestAccountEnabled:$localGuestAccountEnabled"
                 $defaultGateway = (Get-NetIPConfiguration -ErrorAction SilentlyContinue | Foreach IPv4DefaultGateway).nexthop
                 
                 
-                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:DefaultGateway:$defaultGateway"
+                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:Windows:DefaultGateway:$defaultGateway"
 
                 # Windows Version declared at the top
                 
-                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:WindowsVersion:$windowsVersion"
+                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:Windows:Version:$windowsVersion"
                 $windowsVersionMajor = ([environment]::OSVersion.Version).Major
-                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:WindowsVersionMajor:$windowsVersionMajor"
+                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:Windows:VersionMajor:$windowsVersionMajor"
                 
                 #Windows editions declared at beginning of function
-                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:WindowsEdition:$windowsEdition"
+                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:Windows:Edition:$windowsEdition"
                 $unsupportedOS = 10240,10586,14393,15063,16299,17134,17763,18362,18363
                 $osSupported = $OSVersion -notin $unsupportedOS
-                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:OSSupported:$osSupported"
-                $avName = (Get-AntiVirusProduct -ErrorAction SilentlyContinue).'Name'        
-                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:AVName:$avName"
-                $avRealTimeProtectStatus = (Get-AntiVirusProduct -ErrorAction SilentlyContinue).'Real-Time Protection Status'
-                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:AVRealTimeProtectStatus:$avRealTimeProtectStatus"
-                $avDefinitions = (Get-AntiVirusProduct -ErrorAction SilentlyContinue).'Definition Status' 
-            
-                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:AVDefinition:$avDefinitions"
+                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:Windows:OSSupported:$osSupported"
+               
                 $minPassLength = $PassPol.'Minimum Password Length (Chars)'
-                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:MinPassLength:$minPassLength"
+                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:Windows:MinPassLength:$minPassLength"
                 $passHistoryVar = $PassPol.'Enforce Password History (Passwords remembered)'
-                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:MinPassHistory:$passHistoryVar"
+                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:Windows:MinPassHistory:$passHistoryVar"
                 $acctLockoutThresholdVar = $PassPol.'Account Lockout Threshold (Invalid logon attempts)'
-                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:AcctLockoutThreshold:$acctLockoutThresholdVar"
+                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:Windows:AcctLockoutThreshold:$acctLockoutThresholdVar"
                 $acctLockoutDurationVar = $PassPol.'Account Lockout Duration (Minutes)'
-                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:AccountLockoutDuration:$acctLockoutDurationVar"
+                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:Windows:AccountLockoutDuration:$acctLockoutDurationVar"
                 #$gpresultoutput = gpresult /SCOPE USER /R
                 #Write-Host "${computerName}:${ipAddress}:GPResultOutput:$gpresultoutput"
                 $LocalAdmins=(Get-LocalGroupMember -Group "Administrators" -ErrorAction SilentlyContinue).Name
-                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:LocalAdmins:$LocalAdmins"
+                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:Windows:LocalAdmins:$LocalAdmins"
                 $CurrentLoggedInUsers=query user /server:$SERVER
-                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:CurrentLoggedInUsers:$CurrentLoggedInUsers"
+                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:Windows:CurrentLoggedInUsers:$CurrentLoggedInUsers"
                 $LastGPOAppliedTime=[datetime]::FromFileTime(([Int64] ((Get-ItemProperty -Path "Registry::HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy\State\Machine\Extension-List\{00000000-0000-0000-0000-000000000000}").startTimeHi) -shl 32) -bor ((Get-ItemProperty -Path "Registry::HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy\State\Machine\Extension-List\{00000000-0000-0000-0000-000000000000}").startTimeLo))
-                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:LastGPOAppliedTime:$LastGPOAppliedTime"
+                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:Windows:LastGPOAppliedTime:$LastGPOAppliedTime"
 
 
                 $FirefoxInstalled= Test-Path -Path "C:\Program Files\Mozilla Firefox\firefox.exe" -PathType Leaf
-                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:FirefoxInstalled:$FirefoxInstalled"
+                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:Browsers:FirefoxInstalled:$FirefoxInstalled"
                 $EdgeInstalled= Test-Path -Path "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" -PathType Leaf
-                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:EdgeInstalled:$EdgeInstalled"
+                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:Browsers:EdgeInstalled:$EdgeInstalled"
                 $ChromeInstalled=Test-Path -Path "C:\Program Files\Google\Chrome\Application\chrome.exe" -PathType Leaf
-                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:ChromeInstalled:$ChromeInstalled"
+                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:Browsers:ChromeInstalled:$ChromeInstalled"
                 $IEInstalled=Test-Path -Path "C:\Program Files\Internet Explorer\iexplore.exe" -PathType Leaf
-                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:IEInstalled:$IEInstalled"
+                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:Browsers:IEInstalled:$IEInstalled"
 
+                
+                $avName = (Get-AntiVirusProduct -ErrorAction SilentlyContinue).'Name'        
+                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:AV:Name:$avName"
+                $avRealTimeProtectStatus = (Get-AntiVirusProduct -ErrorAction SilentlyContinue).'Real-Time Protection Status'
+                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:AV:RealTimeProtectStatus:$avRealTimeProtectStatus"
+                $avDefinitions = (Get-AntiVirusProduct -ErrorAction SilentlyContinue).'Definition Status' 
+            
+                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:AV:Definition:$avDefinitions"
+
+
+                # I'm not entirely convinced the AV scripts do much, so there might be some duplication with the fields below until I choose when function to use. These work for defender but probably not third party AV 
+                $AVEnabled2=(Get-MpComputerStatus).AntivirusEnabled
+                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:AV:Enabled2:$AVEnabled2"
+                $AVOnAccess=(Get-MpComputerStatus).OnAccessProtectionEnabled
+                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:AV:OnAccess:$AVOnAccess"
+                $AVRealTimeProtectionEnabled=(Get-MpComputerStatus).RealTimeProtectionEnabled 
+                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:AV:RealTimeProtectionEnabled:$AVRealTimeProtectionEnabled"
+                $AVSignatureAge=(Get-MpComputerStatus).AntivirusSignatureAge 
+                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:AV:SignatureAge:$AVSignatureAge"
 
                 # Handy command but not ready to impliment, check if Applocker policy is working command! 
                 # Get-AppLockerPolicy -Local | Test-AppLockerPolicy -Path C:\Windows\System32\*.exe -User Everyone
@@ -167,5 +210,6 @@ function EnumerateEachMachine
 
 }
 
+# Launch the script 
 EnumerateEachMachine
 
