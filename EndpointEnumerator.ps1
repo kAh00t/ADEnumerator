@@ -166,7 +166,7 @@ function EnumerateEachMachine
                 $smbEncryptionEnabled = (Get-SmbServerConfiguration -ErrorAction SilentlyContinue | select EncryptData).EncryptData
                 Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:SMB:SMBEncryptionEnabled:$smbEncryptionEnabled"
                 $smbSigningEnabled = (Get-SmbServerConfiguration -ErrorAction SilentlyContinue | select RequireSecuritySignature).requiresecuritysignature
-                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:SMBLSMBSigningEnabled:$smbSigningEnabled"
+                Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:SMB:SMBSigningEnabled:$smbSigningEnabled"
                 $llmnrstatus = (Get-ItemProperty -path 'HKLM:\Software\policies\Microsoft\Windows NT\DNSClient' -ErrorAction SilentlyContinue).EnableMulticast
                 Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:LLMNR:LLMNR_Status:$llmnrstatus"
                 $ipv6Enabled = Get-NetIPInterface -ErrorAction SilentlyContinue | where AddressFamily -in "IPv6" | select DHCP | where DHCP -Contains Enabled; If ($ipv6Enabled -ne $empty) {$ipv6EnabledStatus = 1} Else {$ipv6EnabledStatus = 0};
