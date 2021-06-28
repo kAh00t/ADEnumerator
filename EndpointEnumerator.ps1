@@ -181,7 +181,7 @@ function EnumerateEachMachine
 
 		        # Check potentially dangerous configurations 
                 $smbV1Enable = (Get-SmbServerConfiguration -ErrorAction SilentlyContinue | select EnableSMB1Protocol).EnableSMB1Protocol
-                DisplayOutput "SMB" "SMBv1" "$smbV1Enable"
+                DisplayOutput "SMB" "SMBv1Enabled" "$smbV1Enable"
                 
                 $smbEncryptionEnabled = (Get-SmbServerConfiguration -ErrorAction SilentlyContinue | select EncryptData).EncryptData
                 DisplayOutput "SMB" "SMBEncryptionEnabled" "$smbEncryptionEnabled"
