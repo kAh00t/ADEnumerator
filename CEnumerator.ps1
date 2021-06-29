@@ -104,13 +104,13 @@ function EnumerateEachMachine
                 DisplayOutput "Browsers" "IEInstalled" "$IEInstalled"
                 
                 # Get Browser versions
-                $firefoxVersion=(Get-Item (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\firefox.exe' -ErrorAction SilentlyContinue).'(Default)').VersionInfo.ProductVersion
+                $firefoxVersion=(Get-Item -ErrorAction SilentlyContinue (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\firefox.exe' -ErrorAction SilentlyContinue).'(Default)').VersionInfo.ProductVersion
                 DisplayOutput "Browsers" "FireFox-Version" "$$firefoxVersion"
-                $msedgeVersion=(Get-Item (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\msedge.exe' -ErrorAction SilentlyContinue).'(Default)').VersionInfo.ProductVersion
+                $msedgeVersion=(Get-Item -ErrorAction SilentlyContinue (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\msedge.exe' -ErrorAction SilentlyContinue).'(Default)').VersionInfo.ProductVersion
                 DisplayOutput "Browsers" "MsEdge-Version" "$msedgeVersion"
-                $chromeVersion=(Get-Item (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe' -ErrorAction SilentlyContinue).'(Default)').VersionInfo.ProductVersion
+                $chromeVersion=(Get-Item -ErrorAction SilentlyContinue (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe' -ErrorAction SilentlyContinue).'(Default)').VersionInfo.ProductVersion
                 DisplayOutput "Browsers" "Chrome-Version" "$chromeVersion"
-                $ieVersion=(Get-Item (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\iexplore.exe' -ErrorAction SilentlyContinue).'(Default)').VersionInfo.ProductVersion
+                $ieVersion=(Get-Item -ErrorAction SilentlyContinue (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\iexplore.exe' -ErrorAction SilentlyContinue).'(Default)').VersionInfo.ProductVersion
                 DisplayOutput "Browsers" "IE-Version" "$ieVersion"
                 
                 # Check AV Products
