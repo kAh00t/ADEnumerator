@@ -23,7 +23,7 @@
 # Function to write out variables to console
 function DisplayOutput {
 	    param([String]$grouping,[String]$category,[String]$output) 
-        Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:${grouping}:${category}:${output}"
+        # Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:${grouping}:${category}:${output}"
 } 
 
 
