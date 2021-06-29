@@ -44,8 +44,8 @@ function EnumerateEachMachine
 		$lastSecurityUpdate = (Get-HotFix -Description Security* -ErrorAction SilentlyContinue | Sort-Object -Property InstalledOn)[-1].installedon
                 DisplayOutput "Windows" "LastSecurityUpdate" "$lastSecurityUpdate"
 
-                $localAdminAccountEnabled = (Get-LocalUser -ErrorAction SilentlyContinue | select Name,Enabled | where Name -in "Administrator").Enabled
-                DisplayOutput "Windows" "LocalAdminAccountEnabled" "$localAdminAccountEnabled"
+                # $localAdminAccountEnabled = (Get-LocalUser -ErrorAction SilentlyContinue | select Name,Enabled | where Name -in "Administrator").Enabled
+                # DisplayOutput "Windows" "LocalAdminAccountEnabled" "$localAdminAccountEnabled"
 
                 $localGuestAccountEnabled = (Get-LocalUser -ErrorAction SilentlyContinue | select Name,Enabled | where Name -in "Guest").enabled
                 DisplayOutput "Windows" "LocalGuestAccountEnabled" "$LocalGuestAccountEnabled"
@@ -90,43 +90,49 @@ function EnumerateEachMachine
 
 
 
-	        # Check Installed Browsers
-                $FirefoxInstalled= Test-Path -Path "C:\Program Files\Mozilla Firefox\firefox.exe" -PathType Leaf
-                DisplayOutput "Browsers" "FirefoxInstalled" "$FirefoxInstalled"
-                
-                $EdgeInstalled= Test-Path -Path "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" -PathType Leaf
-                DisplayOutput "Browsers" "EdgeInstalled" "$EdgeInstalled"
-                
+	        # Check Installed Browsers and Versions
+
+                # Chrome 
                 $ChromeInstalled=Test-Path -Path "C:\Program Files\Google\Chrome\Application\chrome.exe" -PathType Leaf
                 DisplayOutput "Browsers" "ChromeInstalled" "$ChromeInstalled"
-                
-                $IEInstalled=Test-Path -Path "C:\Program Files\Internet Explorer\iexplore.exe " -PathType Leaf
-                DisplayOutput "Browsers" "IEInstalled" "$IEInstalled"
-                
 
                 $error.clear()
                 try { $chromeVersion=(Get-Item (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe' -ErrorAction SilentlyContinue).'(Default)').VersionInfo.ProductVersion }
-                catch { $chromeVersion="NA" }
-               # if (!$error) { "No Error Occured" }
+                catch { $chromeVersion="unknown" }
+                        # if (!$error) { "No Error Occured" }
                 DisplayOutput "Browsers" "Chrome-Version" "$chromeVersion"
 
+                # Firefox 
+                $FirefoxInstalled= Test-Path -Path "C:\Program Files\Mozilla Firefox\firefox.exe" -PathType Leaf
+                DisplayOutput "Browsers" "FirefoxInstalled" "$FirefoxInstalled"
 
-                # Get Browser versions
                 $error.clear()
                 try { $firefoxVersion=(Get-Item (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\firefox.exe' -ErrorAction SilentlyContinue).'(Default)').VersionInfo.ProductVersion }
-                catch { $firefoxVersion="NA" }
+                catch { $firefoxVersion="unknown" }
                 DisplayOutput "Browsers" "FireFox-Version" "$firefoxVersion"
 
+                # Edge
+                $EdgeInstalled= Test-Path -Path "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" -PathType Leaf
+                DisplayOutput "Browsers" "EdgeInstalled" "$EdgeInstalled"
 
                 $error.clear()
                 try { $msedgeVersion=(Get-Item (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\msedge.exe' -ErrorAction SilentlyContinue).'(Default)').VersionInfo.ProductVersion }
-                catch { $msedgeVersion="NA" }
+                catch { $msedgeVersion="unknown" }
                 DisplayOutput "Browsers" "MsEdge-Version" "$msedgeVersion"
                 
+                # IE
+                $IEInstalled=Test-Path -Path "C:\Program Files\Internet Explorer\iexplore.exe " -PathType Leaf
+                DisplayOutput "Browsers" "IEInstalled" "$IEInstalled"
+
                 $error.clear()
                 try {$ieVersion=(Get-Item (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\iexplore.exe' -ErrorAction SilentlyContinue).'(Default)' -ErrorAction SilentlyContinue).VersionInfo.ProductVersion } 
-                catch { $ieVersion="NA" }
+                catch { $ieVersion="unknown" }
                 DisplayOutput "Browsers" "IE-Version" "$ieVersion"
+                
+                
+
+
+
                 
                 # Check AV Products
                 # I'm not entirely convinced the AV scripts do much, so there might be some duplication with the fields below until I choose when function to use. These work for defender but probably not third party AV 
