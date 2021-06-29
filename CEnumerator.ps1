@@ -20,6 +20,9 @@
 # Open the parsed file, remember to choose : as delimeter. 
 # libreoffice excel-parsed.csv 
 
+
+# Table Columns: windowsVersion^windowsEdition^ipAddress^CurrentDomain^computerName^defaultGateway^osSupported^LastGPOAppliedTime^lastSecurityUpdate^LocalGuestAccountEnabled^LocalAdmins^FirewallServiceRunning^firewallStatusDomain^firewallStatusPrivate^firewallStatusPublic^ChromeInstalled^chromeVersion^FirefoxInstalled^firefoxVersion^EdgeInstalled^msedgeVersion^IEInstalled^ieVersion^AVEnabled2^AVOnAccess^AVRealTimeProtectionEnabled^AVSignatureAge"    
+
 # Function to write out variables to console
 function DisplayOutput {
 	    param([String]$grouping,[String]$category,[String]$output) 
@@ -28,7 +31,7 @@ function DisplayOutput {
 
 
 function DisplayOutputAlt {
-    Write-Host "+++ windowsVersion^windowsEdition^ipAddress^CurrentDomain^computerName^defaultGateway^osSupported^LastGPOAppliedTime^lastSecurityUpdate^LocalGuestAccountEnabled^LocalAdmins^FirewallServiceRunning^firewallStatusDomain^firewallStatusPrivate^firewallStatusPublic^ChromeInstalled^chromeVersion^FirefoxInstalled^firefoxVersion^EdgeInstalled^msedgeVersion^IEInstalled^ieVersion^AVEnabled2^AVOnAccess^AVRealTimeProtectionEnabled^AVSignatureAge"    
+    # Write-Host "+++ windowsVersion^windowsEdition^ipAddress^CurrentDomain^computerName^defaultGateway^osSupported^LastGPOAppliedTime^lastSecurityUpdate^LocalGuestAccountEnabled^LocalAdmins^FirewallServiceRunning^firewallStatusDomain^firewallStatusPrivate^firewallStatusPublic^ChromeInstalled^chromeVersion^FirefoxInstalled^firefoxVersion^EdgeInstalled^msedgeVersion^IEInstalled^ieVersion^AVEnabled2^AVOnAccess^AVRealTimeProtectionEnabled^AVSignatureAge"    
     Write-Host "+++ ${windowsVersion}^${windowsEdition}^${ipAddress}^${CurrentDomain}^${computerName}^${defaultGateway}^${osSupported}^${LastGPOAppliedTime}^${lastSecurityUpdate}^${localGuestAccountEnabled}^${LocalAdmins}^${FirewallServiceRunning}^${firewallStatusDomain}^${firewallStatusPrivate}^${firewallStatusPublic}^${ChromeInstalled}^${chromeVersion}^${FirefoxInstalled}^${firefoxVersion}^${EdgeInstalled}^${msedgeVersion}^${IEInstalled}^${ieVersion}^${AVEnabled2}^${AVOnAccess}^${AVRealTimeProtectionEnabled}^${AVSignatureAge}"
 } 
 
@@ -46,7 +49,7 @@ function EnumerateEachMachine
                 $CurrentDomain = $env:USERDNSDOMAIN
 
                 $computerName = $env:COMPUTERNAME
-                Write-Host ">>> +++++++++++++++++ ${CurrentDomain}:${computerName}:${ipAddress}:${windowsEdition}:${windowsVersion} +++++++++++++++++ "
+                # Write-Host ">>> +++++++++++++++++ ${CurrentDomain}:${computerName}:${ipAddress}:${windowsEdition}:${windowsVersion} +++++++++++++++++ "
                
                 # Write-Host "${CurrentDomain}:${computerName}:${ipAddress}:CurrentDomain:$CurrentDomain"
 		        # Windows OS and GPO Enumeration
