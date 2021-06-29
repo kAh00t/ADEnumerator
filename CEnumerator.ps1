@@ -106,7 +106,7 @@ function EnumerateEachMachine
 
                 $error.clear()
                 try { $chromeVersion=(Get-Item (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe' -ErrorAction SilentlyContinue).'(Default)').VersionInfo.ProductVersion }
-                catch { "NotInstalled" }
+                catch { $chromeVersion="NA" }
                # if (!$error) { "No Error Occured" }
                 DisplayOutput "Browsers" "Chrome-Version" "$chromeVersion"
 
@@ -114,18 +114,18 @@ function EnumerateEachMachine
                 # Get Browser versions
                 $error.clear()
                 try { $firefoxVersion=(Get-Item (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\firefox.exe' -ErrorAction SilentlyContinue).'(Default)').VersionInfo.ProductVersion }
-                catch { "NotInstalled" }
+                catch { $firefoxVersion="NA" }
                 DisplayOutput "Browsers" "FireFox-Version" "$firefoxVersion"
 
 
                 $error.clear()
                 try { $msedgeVersion=(Get-Item (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\msedge.exe' -ErrorAction SilentlyContinue).'(Default)').VersionInfo.ProductVersion }
-                catch { "NotInstalled" }
+                catch { $msedgeVersion="NA" }
                 DisplayOutput "Browsers" "MsEdge-Version" "$msedgeVersion"
                 
                 $error.clear()
                 try {$ieVersion=(Get-Item (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\iexplore.exe' -ErrorAction SilentlyContinue).'(Default)' -ErrorAction SilentlyContinue).VersionInfo.ProductVersion } 
-                catch { "NotInstalled" }
+                catch { $ieVersion="NA" }
                 DisplayOutput "Browsers" "IE-Version" "$ieVersion"
                 
                 # Check AV Products
