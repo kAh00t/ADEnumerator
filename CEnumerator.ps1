@@ -28,7 +28,8 @@ function DisplayOutput {
 
 
 function DisplayOutputAlt {
-    Write-Host ">>> ${windowsVersion}:${windowsEdition}:${ipAddress}:${CurrentDomain}:${computerName}:${defaultGateway}:${osSupported}:${LastGPOAppliedTime}:${lastSecurityUpdate}:${localGuestAccountEnabled}:${LocalAdmins}:${FirewallServiceRunning}:${firewallStatusDomain}:${firewallStatusPrivate}:${firewallStatusPublic}:${ChromeInstalled}:${chromeVersion}:${FirefoxInstalled}:${firefoxVersion}:${EdgeInstalled}:${msedgeVersion}:${IEInstalled}:${ieVersion}:${AVEnabled2}:${AVOnAccess}:${AVRealTimeProtectionEnabled}:${AVSignatureAge}"
+    Write-Host "+++ windowsVersion:windowsEdition:ipAddress:CurrentDomain:computerName:defaultGateway:osSupported:LastGPOAppliedTime:lastSecurityUpdate:LocalGuestAccountEnabled:LocalAdmins:FirewallServiceRunning:firewallStatusDomain:firewallStatusPrivate:firewallStatusPublic:ChromeInstalled:chromeVersion:FirefoxInstalled:firefoxVersion:EdgeInstalled:msedgeVersion:IEInstalled:ieVersion:AVEnabled2:AVOnAccess:AVRealTimeProtectionEnabled:AVSignatureAge"    
+    Write-Host "+++ ${windowsVersion}:${windowsEdition}:${ipAddress}:${CurrentDomain}:${computerName}:${defaultGateway}:${osSupported}:${LastGPOAppliedTime}:${lastSecurityUpdate}:${localGuestAccountEnabled}:${LocalAdmins}:${FirewallServiceRunning}:${firewallStatusDomain}:${firewallStatusPrivate}:${firewallStatusPublic}:${ChromeInstalled}:${chromeVersion}:${FirefoxInstalled}:${firefoxVersion}:${EdgeInstalled}:${msedgeVersion}:${IEInstalled}:${ieVersion}:${AVEnabled2}:${AVOnAccess}:${AVRealTimeProtectionEnabled}:${AVSignatureAge}"
 } 
 
 # Main Function 
