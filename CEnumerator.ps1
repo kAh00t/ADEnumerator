@@ -41,6 +41,15 @@ function EnumerateEachMachine
                 # Write-Host "${CurrentDomain}:${computerName}:${ipAddress}:CurrentDomain:$CurrentDomain"
 		        # Windows OS and GPO Enumeration
 
+
+
+                #Windows editions declared at beginning of function
+                DisplayOutput "Windows" "Edition" "$windowsEdition"
+
+
+                # Windows Version declared at the top
+                DisplayOutput "Windows" "Version" "$windowsVersion"
+                                
 		$lastSecurityUpdate = (Get-HotFix -Description Security* -ErrorAction SilentlyContinue | Sort-Object -Property InstalledOn)[-1].installedon
                 DisplayOutput "Windows" "LastSecurityUpdate" "$lastSecurityUpdate"
 
@@ -53,14 +62,11 @@ function EnumerateEachMachine
                 $defaultGateway = (Get-NetIPConfiguration -ErrorAction SilentlyContinue | Foreach IPv4DefaultGateway).nexthop
                 DisplayOutput "Windows" "DefaultGateway" "$defaultGateway"
 
-                # Windows Version declared at the top
-                DisplayOutput "Windows" "Version" "$windowsVersion"
 		
-                $windowsVersionMajor = ([environment]::OSVersion.Version).Major
-                DisplayOutput "Windows" "VersionMajor" "$windowsVersionMajor"
+                # $windowsVersionMajor = ([environment]::OSVersion.Version).Major
+                # DisplayOutput "Windows" "VersionMajor" "$windowsVersionMajor"
 
-                #Windows editions declared at beginning of function
-                DisplayOutput "Windows" "Edition" "$windowsEdition"
+
 
                 $unsupportedOS = 10240,10586,14393,15063,16299,17134,17763,18362,18363
                 $osSupported = $OSVersion -notin $unsupportedOS
