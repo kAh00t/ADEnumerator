@@ -53,7 +53,6 @@ function EnumerateEachMachine
                 $defaultGateway = (Get-NetIPConfiguration -ErrorAction SilentlyContinue | Foreach IPv4DefaultGateway).nexthop
                 DisplayOutput "Windows" "DefaultGateway" "$defaultGateway"
 
-
                 # Windows Version declared at the top
                 DisplayOutput "Windows" "Version" "$windowsVersion"
 		
@@ -70,7 +69,6 @@ function EnumerateEachMachine
                 $LocalAdmins=(Get-LocalGroupMember -Group "Administrators" -ErrorAction SilentlyContinue).Name
                 DisplayOutput "Windows" "LocalAdmins" "$LocalAdmins"
 
-               
                 $LastGPOAppliedTime=[datetime]::FromFileTime(([Int64] ((Get-ItemProperty -Path "Registry::HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy\State\Machine\Extension-List\{00000000-0000-0000-0000-000000000000}").startTimeHi) -shl 32) -bor ((Get-ItemProperty -Path "Registry::HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy\State\Machine\Extension-List\{00000000-0000-0000-0000-000000000000}").startTimeLo))
                 DisplayOutput "Windows" "LastGPOAppliedTime" "$LastGPOAppliedTime"
 
@@ -90,7 +88,9 @@ function EnumerateEachMachine
 
 		        # Check potentially dangerous configurations 
 
-		         # Check Installed Browsers
+
+                        
+	        # Check Installed Browsers
                 $FirefoxInstalled= Test-Path -Path "C:\Program Files\Mozilla Firefox\firefox.exe" -PathType Leaf
                 DisplayOutput "Browsers" "FirefoxInstalled" "$FirefoxInstalled"
                 
@@ -103,6 +103,15 @@ function EnumerateEachMachine
                 $IEInstalled=Test-Path -Path "C:\Program Files\Internet Explorer\iexplore.exe" -PathType Leaf
                 DisplayOutput "Browsers" "IEInstalled" "$IEInstalled"
                 
+                # Get Browser versions
+                $firefoxVersion=(Get-Item (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\firefox.exe').'(Default)').VersionInfo.ProductVersion
+                DisplayOutput "Browsers" "FireFox-Version" "$$firefoxVersion"
+                $msedgeVersion=(Get-Item (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\msedge.exe').'(Default)').VersionInfo.ProductVersion
+                DisplayOutput "Browsers" "MsEdge-Version" "$msedgeVersion"
+                $chromeVersion=(Get-Item (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe').'(Default)').VersionInfo.ProductVersion
+                DisplayOutput "Browsers" "Chrome-Version" "$chromeVersion"
+                $ieVersion=(Get-Item (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\iexplore.exe').'(Default)').VersionInfo.ProductVersion
+                DisplayOutput "Browsers" "IE-Version" "$ieVersion"
                 
                 # Check AV Products
                 # I'm not entirely convinced the AV scripts do much, so there might be some duplication with the fields below until I choose when function to use. These work for defender but probably not third party AV 
@@ -119,7 +128,10 @@ function EnumerateEachMachine
                 DisplayOutput "AV" "SignatureAge" "$AVSignatureAge"
 
                 # Handy command but not ready to impliment, check if Applocker policy is working command! 
-                # Get-AppLockerPolicy -Local | Test-AppLockerPolicy -Path C:\Windows\System32\*.exe -User Everyone
+
+                
+
+
                 
  };
 
