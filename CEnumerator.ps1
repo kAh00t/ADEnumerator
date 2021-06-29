@@ -105,7 +105,7 @@ function EnumerateEachMachine
                 
                 # Get Browser versions
                 $firefoxVersion=(Get-Item -ErrorAction SilentlyContinue (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\firefox.exe' -ErrorAction SilentlyContinue).'(Default)').VersionInfo.ProductVersion
-                DisplayOutput "Browsers" "FireFox-Version" "$$firefoxVersion"
+                DisplayOutput "Browsers" "FireFox-Version" "$firefoxVersion"
                 $msedgeVersion=(Get-Item -ErrorAction SilentlyContinue (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\msedge.exe' -ErrorAction SilentlyContinue).'(Default)').VersionInfo.ProductVersion
                 DisplayOutput "Browsers" "MsEdge-Version" "$msedgeVersion"
                 $chromeVersion=(Get-Item -ErrorAction SilentlyContinue (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe' -ErrorAction SilentlyContinue).'(Default)').VersionInfo.ProductVersion
