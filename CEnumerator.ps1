@@ -90,10 +90,16 @@ function EnumerateEachMachine
 		
                 # $windowsVersionMajor = ([environment]::OSVersion.Version).Major
                 # DisplayOutput "Windows" "VersionMajor" "$windowsVersionMajor"
-
-                $LocalAdmins=(Get-LocalGroupMember -Group "Administrators" -ErrorAction SilentlyContinue).Name
+                $error.clear()
+                
                 DisplayOutput "Windows" "LocalAdmins" "$LocalAdmins"
 
+
+             
+                try { $LocalAdmins=(Get-LocalGroupMember -Group "Administrators" -ErrorAction SilentlyContinue).Name }
+                catch { $LocalAdmins="unknown" }
+                        # if (!$error) { "No Error Occured" }
+                
                 
 
 		# Check Firewalls 
