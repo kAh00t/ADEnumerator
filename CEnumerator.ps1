@@ -108,19 +108,19 @@ function EnumerateEachMachine
                 try { $chromeVersion=(Get-Item (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe' -ErrorAction SilentlyContinue).'(Default)').VersionInfo.ProductVersion }
                 catch { "Error occured" }
                # if (!$error) { "No Error Occured" }
+                DisplayOutput "Browsers" "Chrome-Version" "$chromeVersion"
+
 
                 # Get Browser versions
                 $error.clear()
-                try {$firefoxVersion=(Get-Item (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\firefox.exe' -ErrorAction SilentlyContinue).'(Default)').VersionInfo.ProductVersion }
-                DisplayOutput "Browsers" "FireFox-Version" "$firefoxVersion"
+                try { $firefoxVersion=(Get-Item (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\firefox.exe' -ErrorAction SilentlyContinue).'(Default)').VersionInfo.ProductVersion }
                 catch { "Error occured" }
-
-
+                DisplayOutput "Browsers" "FireFox-Version" "$firefoxVersion"
                 
                 $msedgeVersion=(Get-Item (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\msedge.exe' -ErrorAction SilentlyContinue).'(Default)').VersionInfo.ProductVersion
                 DisplayOutput "Browsers" "MsEdge-Version" "$msedgeVersion"
                 
-                DisplayOutput "Browsers" "Chrome-Version" "$chromeVersion"
+               
                 $ieVersion=(Get-Item (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\iexplore.exe' -ErrorAction SilentlyContinue).'(Default)' -ErrorAction SilentlyContinue).VersionInfo.ProductVersion
                 DisplayOutput "Browsers" "IE-Version" "$ieVersion"
                 
