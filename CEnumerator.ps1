@@ -39,12 +39,9 @@ function EnumerateEachMachine
                 Write-Host ">>> +++++++++++++++++ ${CurrentDomain}:${computerName}:${ipAddress}:${windowsEdition}:${windowsVersion} +++++++++++++++++ "
                
                 # Write-Host "${CurrentDomain}:${computerName}:${ipAddress}:CurrentDomain:$CurrentDomain"
-		        # Windows OS and GPO Enumeration 
+		        # Windows OS and GPO Enumeration
 
-                $PassPol = Get-PassPol -ErrorAction SilentlyContinue
-                DisplayOutput "Windows" "Password-Policy" "$PassPol"
-
-		        $lastSecurityUpdate = (Get-HotFix -Description Security* -ErrorAction SilentlyContinue | Sort-Object -Property InstalledOn)[-1].installedon
+		$lastSecurityUpdate = (Get-HotFix -Description Security* -ErrorAction SilentlyContinue | Sort-Object -Property InstalledOn)[-1].installedon
                 DisplayOutput "Windows" "LastSecurityUpdate" "$lastSecurityUpdate"
 
                 $localAdminAccountEnabled = (Get-LocalUser -ErrorAction SilentlyContinue | select Name,Enabled | where Name -in "Administrator").Enabled
@@ -52,15 +49,14 @@ function EnumerateEachMachine
 
                 $localGuestAccountEnabled = (Get-LocalUser -ErrorAction SilentlyContinue | select Name,Enabled | where Name -in "Guest").enabled
                 DisplayOutput "Windows" "LocalGuestAccountEnabled" "$LocalGuestAccountEnabled"
-               
-               
+
                 $defaultGateway = (Get-NetIPConfiguration -ErrorAction SilentlyContinue | Foreach IPv4DefaultGateway).nexthop
                 DisplayOutput "Windows" "DefaultGateway" "$defaultGateway"
 
 
                 # Windows Version declared at the top
                 DisplayOutput "Windows" "Version" "$windowsVersion"
-
+		
                 $windowsVersionMajor = ([environment]::OSVersion.Version).Major
                 DisplayOutput "Windows" "VersionMajor" "$windowsVersionMajor"
 
@@ -71,8 +67,6 @@ function EnumerateEachMachine
                 $osSupported = $OSVersion -notin $unsupportedOS
                 DisplayOutput "Windows" "OSSupported" "$osSupported"
 
-               
-               
                 $LocalAdmins=(Get-LocalGroupMember -Group "Administrators" -ErrorAction SilentlyContinue).Name
                 DisplayOutput "Windows" "LocalAdmins" "$LocalAdmins"
 
