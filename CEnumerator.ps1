@@ -49,7 +49,15 @@ function EnumerateEachMachine
 
                 # Windows Version declared at the top
                 DisplayOutput "Windows" "Version" "$windowsVersion"
-                                
+
+                $unsupportedOS = 10240,10586,14393,15063,16299,17134,17763,18362,18363
+                $osSupported = $OSVersion -notin $unsupportedOS
+                DisplayOutput "Windows" "OSSupported" "$osSupported"
+                
+                $LastGPOAppliedTime=[datetime]::FromFileTime(([Int64] ((Get-ItemProperty -Path "Registry::HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy\State\Machine\Extension-List\{00000000-0000-0000-0000-000000000000}").startTimeHi) -shl 32) -bor ((Get-ItemProperty -Path "Registry::HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy\State\Machine\Extension-List\{00000000-0000-0000-0000-000000000000}").startTimeLo))
+                DisplayOutput "Windows" "LastGPOAppliedTime" "$LastGPOAppliedTime"
+
+
 		$lastSecurityUpdate = (Get-HotFix -Description Security* -ErrorAction SilentlyContinue | Sort-Object -Property InstalledOn)[-1].installedon
                 DisplayOutput "Windows" "LastSecurityUpdate" "$lastSecurityUpdate"
 
@@ -66,17 +74,10 @@ function EnumerateEachMachine
                 # $windowsVersionMajor = ([environment]::OSVersion.Version).Major
                 # DisplayOutput "Windows" "VersionMajor" "$windowsVersionMajor"
 
-
-
-                $unsupportedOS = 10240,10586,14393,15063,16299,17134,17763,18362,18363
-                $osSupported = $OSVersion -notin $unsupportedOS
-                DisplayOutput "Windows" "OSSupported" "$osSupported"
-
                 $LocalAdmins=(Get-LocalGroupMember -Group "Administrators" -ErrorAction SilentlyContinue).Name
                 DisplayOutput "Windows" "LocalAdmins" "$LocalAdmins"
 
-                $LastGPOAppliedTime=[datetime]::FromFileTime(([Int64] ((Get-ItemProperty -Path "Registry::HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy\State\Machine\Extension-List\{00000000-0000-0000-0000-000000000000}").startTimeHi) -shl 32) -bor ((Get-ItemProperty -Path "Registry::HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy\State\Machine\Extension-List\{00000000-0000-0000-0000-000000000000}").startTimeLo))
-                DisplayOutput "Windows" "LastGPOAppliedTime" "$LastGPOAppliedTime"
+                
 
 		# Check Firewalls 
                 $FWService = (Get-Service | ?{$_.Name -eq "mpssvc"})
