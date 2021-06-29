@@ -89,7 +89,7 @@ function EnumerateEachMachine
 		        # Check potentially dangerous configurations 
 
 
-                        
+
 	        # Check Installed Browsers
                 $FirefoxInstalled= Test-Path -Path "C:\Program Files\Mozilla Firefox\firefox.exe" -PathType Leaf
                 DisplayOutput "Browsers" "FirefoxInstalled" "$FirefoxInstalled"
@@ -100,17 +100,17 @@ function EnumerateEachMachine
                 $ChromeInstalled=Test-Path -Path "C:\Program Files\Google\Chrome\Application\chrome.exe" -PathType Leaf
                 DisplayOutput "Browsers" "ChromeInstalled" "$ChromeInstalled"
                 
-                $IEInstalled=Test-Path -Path "C:\Program Files\Internet Explorer\iexplore.exe" -PathType Leaf
+                $IEInstalled=Test-Path -Path "C:\Program Files\Internet Explorer\iexplore.exe " -PathType Leaf
                 DisplayOutput "Browsers" "IEInstalled" "$IEInstalled"
                 
                 # Get Browser versions
-                $firefoxVersion=(Get-Item (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\firefox.exe').'(Default)').VersionInfo.ProductVersion
+                $firefoxVersion=(Get-Item (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\firefox.exe' -ErrorAction SilentlyContinue).'(Default)').VersionInfo.ProductVersion
                 DisplayOutput "Browsers" "FireFox-Version" "$$firefoxVersion"
-                $msedgeVersion=(Get-Item (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\msedge.exe').'(Default)').VersionInfo.ProductVersion
+                $msedgeVersion=(Get-Item (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\msedge.exe' -ErrorAction SilentlyContinue).'(Default)').VersionInfo.ProductVersion
                 DisplayOutput "Browsers" "MsEdge-Version" "$msedgeVersion"
-                $chromeVersion=(Get-Item (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe').'(Default)').VersionInfo.ProductVersion
+                $chromeVersion=(Get-Item (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe' -ErrorAction SilentlyContinue).'(Default)').VersionInfo.ProductVersion
                 DisplayOutput "Browsers" "Chrome-Version" "$chromeVersion"
-                $ieVersion=(Get-Item (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\iexplore.exe').'(Default)').VersionInfo.ProductVersion
+                $ieVersion=(Get-Item (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\iexplore.exe' -ErrorAction SilentlyContinue).'(Default)').VersionInfo.ProductVersion
                 DisplayOutput "Browsers" "IE-Version" "$ieVersion"
                 
                 # Check AV Products
