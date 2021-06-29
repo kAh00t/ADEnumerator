@@ -42,10 +42,15 @@ function EnumerateEachMachine
 		        # Windows OS and GPO Enumeration
 
 
+                DisplayOutput "Windows" "DomainName" "$CurrentDomain"
+
+                DisplayOutput "Windows" "ComputerName" "$computerName"
+
+                $defaultGateway = (Get-NetIPConfiguration -ErrorAction SilentlyContinue | Foreach IPv4DefaultGateway).nexthop
+                DisplayOutput "Windows" "DefaultGateway" "$defaultGateway"
 
                 #Windows editions declared at beginning of function
                 DisplayOutput "Windows" "Edition" "$windowsEdition"
-
 
                 # Windows Version declared at the top
                 DisplayOutput "Windows" "Version" "$windowsVersion"
@@ -67,8 +72,7 @@ function EnumerateEachMachine
                 $localGuestAccountEnabled = (Get-LocalUser -ErrorAction SilentlyContinue | select Name,Enabled | where Name -in "Guest").enabled
                 DisplayOutput "Windows" "LocalGuestAccountEnabled" "$LocalGuestAccountEnabled"
 
-                $defaultGateway = (Get-NetIPConfiguration -ErrorAction SilentlyContinue | Foreach IPv4DefaultGateway).nexthop
-                DisplayOutput "Windows" "DefaultGateway" "$defaultGateway"
+
 
 		
                 # $windowsVersionMajor = ([environment]::OSVersion.Version).Major
