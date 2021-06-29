@@ -110,8 +110,13 @@ function EnumerateEachMachine
                # if (!$error) { "No Error Occured" }
 
                 # Get Browser versions
-                $firefoxVersion=(Get-Item (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\firefox.exe' -ErrorAction SilentlyContinue).'(Default)').VersionInfo.ProductVersion
+                $error.clear()
+                try {$firefoxVersion=(Get-Item (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\firefox.exe' -ErrorAction SilentlyContinue).'(Default)').VersionInfo.ProductVersion }
                 DisplayOutput "Browsers" "FireFox-Version" "$firefoxVersion"
+                catch { "Error occured" }
+
+
+                
                 $msedgeVersion=(Get-Item (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\msedge.exe' -ErrorAction SilentlyContinue).'(Default)').VersionInfo.ProductVersion
                 DisplayOutput "Browsers" "MsEdge-Version" "$msedgeVersion"
                 
