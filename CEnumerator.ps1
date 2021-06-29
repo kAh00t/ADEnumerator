@@ -95,7 +95,7 @@ function EnumerateEachMachine
                 DisplayOutput "Windows" "LocalAdmins" "$LocalAdmins"
 
 
-             
+                LocalAdmins="na"
                 try { $LocalAdmins=(Get-LocalGroupMember -Group "Administrators" -ErrorAction SilentlyContinue).Name }
                 catch { $LocalAdmins="unknown" }
                         # if (!$error) { "No Error Occured" }
