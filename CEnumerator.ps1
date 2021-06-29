@@ -10,6 +10,10 @@
 # OR
 # crackmapexec smb 192.168.123.0/24 -u 'USERNAME' -p 'PASSWORD' -x "powershell.exe -exec Bypass -C \"IEX (New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/kAh00t/ADEnumerator/main/CEnumerator.ps1')\"" | tee cmeoutput.txt
 
+# OR
+
+# crackmapexec smb alive-windowsmachines.txt -u 'username' -p 'password' -X "IEX (New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/kAh00t/ADEnumerator/main/CEnumerator.ps1')" | tee output.txt
+
 # Parse and remove weird encoding string issue I've not worked out 
 # cat cmeoutput.txt | grep ">>>" | cut -d ">" -f 4 | sed -e 's/\[0m//' >> excel-parsed.csv
 
@@ -20,6 +24,11 @@
 function DisplayOutput {
 	    param([String]$grouping,[String]$category,[String]$output) 
         Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:${grouping}:${category}:${output}"
+} 
+
+
+function DisplayOutputAlt {
+    Write-Host ">>> ${windowsVersion}:${windowsEdition}:${ipAddress}:${CurrentDomain}:${computerName}:${defaultGateway}:${osSupported}:${LastGPOAppliedTime}:${lastSecurityUpdate}:${localGuestAccountEnabled}:${LocalAdmins}:${FirewallServiceRunning}:${firewallStatusDomain}:${firewallStatusPrivate}:${firewallStatusPublic}:${ChromeInstalled}:${chromeVersion}:${FirefoxInstalled}:${firefoxVersion}:${EdgeInstalled}:${msedgeVersion}:${IEInstalled}:${ieVersion}:${AVEnabled2}:${AVOnAccess}:${AVRealTimeProtectionEnabled}:${AVSignatureAge}"
 } 
 
 # Main Function 
@@ -59,11 +68,11 @@ function EnumerateEachMachine
                 $osSupported = $OSVersion -notin $unsupportedOS
                 DisplayOutput "Windows" "OSSupported" "$osSupported"
                 
-                $LastGPOAppliedTime=[datetime]::FromFileTime(([Int64] ((Get-ItemProperty -Path "Registry::HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy\State\Machine\Extension-List\{00000000-0000-0000-0000-000000000000}").startTimeHi) -shl 32) -bor ((Get-ItemProperty -Path "Registry::HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy\State\Machine\Extension-List\{00000000-0000-0000-0000-000000000000}").startTimeLo))
+                $LastGPOAppliedTime = [datetime]::FromFileTime(([Int64] ((Get-ItemProperty -Path "Registry::HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy\State\Machine\Extension-List\{00000000-0000-0000-0000-000000000000}").startTimeHi) -shl 32) -bor ((Get-ItemProperty -Path "Registry::HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy\State\Machine\Extension-List\{00000000-0000-0000-0000-000000000000}").startTimeLo))
                 DisplayOutput "Windows" "LastGPOAppliedTime" "$LastGPOAppliedTime"
 
 
-		$lastSecurityUpdate = (Get-HotFix -Description Security* -ErrorAction SilentlyContinue | Sort-Object -Property InstalledOn)[-1].installedon
+		$lastSecurityUpdate= (Get-HotFix -Description Security* -ErrorAction SilentlyContinue | Sort-Object -Property InstalledOn)[-1].installedon
                 DisplayOutput "Windows" "LastSecurityUpdate" "$lastSecurityUpdate"
 
                 # $localAdminAccountEnabled = (Get-LocalUser -ErrorAction SilentlyContinue | select Name,Enabled | where Name -in "Administrator").Enabled
@@ -159,6 +168,8 @@ function EnumerateEachMachine
                 $AVSignatureAge=(Get-MpComputerStatus -ErrorAction SilentlyContinue).AntivirusSignatureAge 
                 DisplayOutput "AV" "SignatureAge" "$AVSignatureAge"
 
+
+                DisplayOutputAlt
                 # Handy command but not ready to impliment, check if Applocker policy is working command! 
 
                 
