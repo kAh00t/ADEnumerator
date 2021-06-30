@@ -21,7 +21,7 @@
 # libreoffice excel-parsed.csv 
 
 
-# Table Columns: windowsVersion^windowsEdition^ipAddress^CurrentDomain^computerName^defaultGateway^osSupported^LastGPOAppliedTime^lastSecurityUpdate^LocalGuestAccountEnabled^LocalAdmins^FirewallServiceRunning^firewallStatusDomain^firewallStatusPrivate^firewallStatusPublic^ChromeInstalled^chromeVersion^FirefoxInstalled^firefoxVersion^EdgeInstalled^msedgeVersion^IEInstalled^ieVersion^AVEnabled2^AVOnAccess^AVRealTimeProtectionEnabled^AVSignatureAge"    
+# Table Columns: windowsVersion twindowsEdition tipAddress      CurrentDomain   computerName    defaultGateway     osSupported     LastGPOAppliedTime     lastSecurityUpdate     LocalGuestAccountEnabled     LocalAdmins     FirewallServiceRunning     firewallStatusDomain     firewallStatusPrivate     firewallStatusPublic     ChromeInstalled     chromeVersion     FirefoxInstalled     firefoxVersion     EdgeInstalled     msedgeVersion     IEInstalled     ieVersion     AVEnabled2     AVOnAccess     AVRealTimeProtectionEnabled     AVSignatureAge         
 
 # Function to write out variables to console
 function DisplayOutput {
