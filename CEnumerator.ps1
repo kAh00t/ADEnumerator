@@ -32,7 +32,7 @@ function DisplayOutput {
 
 function DisplayOutputAlt {
     # Write-Host "+++ windowsVersion^windowsEdition^ipAddress^CurrentDomain^computerName^defaultGateway^osSupported^LastGPOAppliedTime^lastSecurityUpdate^LocalGuestAccountEnabled^LocalAdmins^FirewallServiceRunning^firewallStatusDomain^firewallStatusPrivate^firewallStatusPublic^ChromeInstalled^chromeVersion^FirefoxInstalled^firefoxVersion^EdgeInstalled^msedgeVersion^IEInstalled^ieVersion^AVEnabled2^AVOnAccess^AVRealTimeProtectionEnabled^AVSignatureAge"    
-     Write-Host "`t+++`t${windowsVersion}`t${windowsEdition}`t${ipAddress}`t${CurrentDomain}`t${computerName}`t${defaultGateway}`t${osSupported}`t${LastGPOAppliedTime}   ${lastSecurityUpdate}   ${localGuestAccountEnabled}     ${LocalAdmins}  ${FirewallServiceRunning}       ${firewallStatusDomain} ${firewallStatusPrivate}        ${firewallStatusPublic} ${ChromeInstalled}      ${chromeVersion}        ${FirefoxInstalled}     ${firefoxVersion}       ${EdgeInstalled}        ${msedgeVersion}        ${IEInstalled}  ${ieVersion}    ${AVEnabled2}   ${AVOnAccess}   ${AVRealTimeProtectionEnabled}  ${AVSignatureAge}       "
+     Write-Host "`t+++`t${windowsVersion}`t${windowsEdition}`t${ipAddress}`t${CurrentDomain}`t${computerName}`t${defaultGateway}`t${osSupported}`t${LastGPOAppliedTime}`t${lastSecurityUpdate}`t${localGuestAccountEnabled}`t${LocalAdmins}`t${FirewallServiceRunning}`t${firewallStatusDomain}`t${firewallStatusPrivate}`t${firewallStatusPublic}`t${ChromeInstalled}`t${chromeVersion}`t${FirefoxInstalled}`t${firefoxVersion}`t${EdgeInstalled}`t${msedgeVersion}`t${IEInstalled}`t${ieVersion}`t${AVEnabled2}`t${AVOnAccess}`t${AVRealTimeProtectionEnabled}`t${AVSignatureAge}`t"
 } 
 
 # Main Function 
