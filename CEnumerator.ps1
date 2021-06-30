@@ -45,10 +45,18 @@ function EnumerateEachMachine
                 # to add: Windows Firewall Enabled, DomainName, Windows Automatic updates set NBT over TCP/IP disabled on all interfaces, account lockout, local password policy , Test-ComputerSecureChannel?, 
                 # to double check: the IP address is currently looking for the first IPv4 match, will that work if they are on a VPN/different adapater? mmm
                 
-                $ipAddress = $(ipconfig | where {$_ -match 'IPv4.+\s(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})' } | out-null; $Matches[1])
-                $CurrentDomain = $env:USERDNSDOMAIN
+                # Get first IP out of list (might not be the primary IP, be warned )
+                try {$ipAddress = $(ipconfig | where {$_ -match 'IPv4.+\s(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})' } | out-null; $Matches[1])}
+                catch { $ipAddress = "unknown" } 
 
-                $computerName = $env:COMPUTERNAME
+                # Get Domain for host 
+                try { $CurrentDomain = $env:USERDNSDOMAIN }
+                catch { $CurrentDomain = "unknown" }
+
+                # Get computer name 
+                try { $computerName = $env:COMPUTERNAME }
+                catch { $computerName = "unknown" }
+
                 # Write-Host ">>> +++++++++++++++++ ${CurrentDomain}:${computerName}:${ipAddress}:${windowsEdition}:${windowsVersion} +++++++++++++++++ "
                
                 # Write-Host "${CurrentDomain}:${computerName}:${ipAddress}:CurrentDomain:$CurrentDomain"
@@ -56,10 +64,11 @@ function EnumerateEachMachine
 
 
                 DisplayOutput "Windows" "DomainName" "$CurrentDomain"
-
                 DisplayOutput "Windows" "ComputerName" "$computerName"
 
-                $defaultGateway = (Get-NetIPConfiguration -ErrorAction SilentlyContinue | Foreach IPv4DefaultGateway).nexthop
+                # Get default gateway (next hop)
+                try {$defaultGateway = (Get-NetIPConfiguration -ErrorAction SilentlyContinue | Foreach IPv4DefaultGateway).nexthop}
+                catch { $defaultGateway = "unknown" }
                 DisplayOutput "Windows" "DefaultGateway" "$defaultGateway"
 
                 #Windows editions declared at beginning of function
@@ -68,93 +77,110 @@ function EnumerateEachMachine
                 # Windows Version declared at the top
                 DisplayOutput "Windows" "Version" "$windowsVersion"
 
+
+                # Check OS Supported (when compared to list of unsupported Windows systems) - note: As windows 10 and server use the same code for different versions of either, 
+                # this may show false positives, the codes here are for Windows 10. 
+
                 $unsupportedOS = 10240,10586,14393,15063,16299,17134,17763,18362,18363
-                $osSupported = $OSVersion -notin $unsupportedOS
+                try {$osSupported = $OSVersion -notin $unsupportedOS }
+                catch { $osSupported = "unknown"}
                 DisplayOutput "Windows" "OSSupported" "$osSupported"
                 
-                $LastGPOAppliedTime = [datetime]::FromFileTime(([Int64] ((Get-ItemProperty -Path "Registry::HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy\State\Machine\Extension-List\{00000000-0000-0000-0000-000000000000}").startTimeHi) -shl 32) -bor ((Get-ItemProperty -Path "Registry::HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy\State\Machine\Extension-List\{00000000-0000-0000-0000-000000000000}").startTimeLo))
+                # Last GPO applied time  
+                try {$LastGPOAppliedTime = [datetime]::FromFileTime(([Int64] ((Get-ItemProperty -Path "Registry::HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy\State\Machine\Extension-List\{00000000-0000-0000-0000-000000000000}").startTimeHi) -shl 32) -bor ((Get-ItemProperty -Path "Registry::HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy\State\Machine\Extension-List\{00000000-0000-0000-0000-000000000000}").startTimeLo))}
+                catch { $LastGPOAppliedTime = "unknown" }
                 DisplayOutput "Windows" "LastGPOAppliedTime" "$LastGPOAppliedTime"
 
-
-		$lastSecurityUpdate= (Get-HotFix -Description Security* -ErrorAction SilentlyContinue | Sort-Object -Property InstalledOn)[-1].installedon
+                # Date last security update was installed  
+		try {$lastSecurityUpdate= (Get-HotFix -Description Security* -ErrorAction SilentlyContinue | Sort-Object -Property InstalledOn)[-1].installedon}
+                catch { $lastSecurityUpdate = "unknown" }
                 DisplayOutput "Windows" "LastSecurityUpdate" "$lastSecurityUpdate"
 
                 # $localAdminAccountEnabled = (Get-LocalUser -ErrorAction SilentlyContinue | select Name,Enabled | where Name -in "Administrator").Enabled
                 # DisplayOutput "Windows" "LocalAdminAccountEnabled" "$localAdminAccountEnabled"
 
-                $localGuestAccountEnabled = (Get-LocalUser -ErrorAction SilentlyContinue | select Name,Enabled | where Name -in "Guest").enabled
+                # Check Guest Account Enabled 
+                 
+                try {$localGuestAccountEnabled = (Get-LocalUser -ErrorAction SilentlyContinue | select Name,Enabled | where Name -in "Guest").enabled}
+                catch { $localGuestAccountEnabled = "Unknown"}
                 DisplayOutput "Windows" "LocalGuestAccountEnabled" "$LocalGuestAccountEnabled"
 
-
-
-		
                 # $windowsVersionMajor = ([environment]::OSVersion.Version).Major
                 # DisplayOutput "Windows" "VersionMajor" "$windowsVersionMajor"
-                $error.clear()
-                
-                DisplayOutput "Windows" "LocalAdmins" "$LocalAdmins"
 
-
+                 
                 $LocalAdmins = "na"
                 try { $LocalAdmins=(Get-LocalGroupMember -Group "Administrators" -ErrorAction SilentlyContinue).Name }
-                catch { $LocalAdmins="unknown" }
+                catch { $LocalAdmins = "unknown" }
                         # if (!$error) { "No Error Occured" }
+                DisplayOutput "Windows" "LocalAdmins" "$LocalAdmins"
                 
-                
-
-		# Check Firewalls 
-                $FWService = (Get-Service | ?{$_.Name -eq "mpssvc"})
+                # Check if Windows Firewall enabled 
+                 
+                try {$FWService = (Get-Service | ?{$_.Name -eq "mpssvc"})}
+                catch {$FWService = "unknown"}
                 $FWService | %{If($_.Status -eq "Running"){$FirewallServiceRunning="True"}Else{$FirewallServiceRunning="False"}
                 DisplayOutput "Firewall" "FirewallServiceRunning" "$FirewallServiceRunning"
                 
-                $firewallStatusDomain = (Get-NetFirewallProfile -ErrorAction SilentlyContinue | select Name,Enabled | where Name -in "Domain" ).enabled 
+                # Check which Windows Firewall profile is enabled (Domain/Private/Public)
+                 
+                try {$firewallStatusDomain = (Get-NetFirewallProfile -ErrorAction SilentlyContinue | select Name,Enabled | where Name -in "Domain" ).enabled }
+                catch { $firewallStatusDomain = "unknown"}
                 DisplayOutput "Firewall" "FirewallStatusDomain" "$firewallStatusDomain"
-                
-                $firewallStatusPrivate = (Get-NetFirewallProfile -ErrorAction SilentlyContinue | select Name,Enabled | where Name -in "Private" ).enabled
+                 
+                try {$firewallStatusPrivate = (Get-NetFirewallProfile -ErrorAction SilentlyContinue | select Name,Enabled | where Name -in "Private" ).enabled }
+                catch { $firewallStatusPrivate }
                 DisplayOutput "Firewall" "FirewallStatusPrivate" "$firewallStatusPrivate"
-                
-                $firewallStatusPublic = (Get-NetFirewallProfile | select Name,Enabled | where Name -in "Public").enabled
-		        DisplayOutput "Firewall" "FirewallStatusPublic" "$firewallStatusPublic"
-
-		        # Check potentially dangerous configurations 
-
+        
+                try {$firewallStatusPublic = (Get-NetFirewallProfile | select Name,Enabled | where Name -in "Public").enabled }
+                catch {$firewallStatusPublic = "unknown"}
+		DisplayOutput "Firewall" "FirewallStatusPublic" "$firewallStatusPublic"
 
 
 	        # Check Installed Browsers and Versions
 
                 # Chrome 
-                $ChromeInstalled=Test-Path -Path "C:\Program Files\Google\Chrome\Application\chrome.exe" -PathType Leaf
+                # Chrome Installed 
+                try {$ChromeInstalled=Test-Path -Path "C:\Program Files\Google\Chrome\Application\chrome.exe" -PathType Leaf}
+                catch { $ChromeInstalled = "unknown" }
                 DisplayOutput "Browsers" "ChromeInstalled" "$ChromeInstalled"
 
-                $error.clear()
+                # Chrome Version  
                 try { $chromeVersion=(Get-Item (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe' -ErrorAction SilentlyContinue).'(Default)').VersionInfo.ProductVersion }
                 catch { $chromeVersion="unknown" }
                         # if (!$error) { "No Error Occured" }
                 DisplayOutput "Browsers" "Chrome-Version" "$chromeVersion"
 
                 # Firefox 
-                $FirefoxInstalled= Test-Path -Path "C:\Program Files\Mozilla Firefox\firefox.exe" -PathType Leaf
+                # Firefox Installed  
+                try {$FirefoxInstalled= Test-Path -Path "C:\Program Files\Mozilla Firefox\firefox.exe" -PathType Leaf}
+                catch { $FirefoxInstalled = "unknown" }
                 DisplayOutput "Browsers" "FirefoxInstalled" "$FirefoxInstalled"
 
-                $error.clear()
+                # Firefox Version 
                 try { $firefoxVersion=(Get-Item (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\firefox.exe' -ErrorAction SilentlyContinue).'(Default)').VersionInfo.ProductVersion }
-                catch { $firefoxVersion="unknown" }
+                catch { $firefoxVersion = "unknown" }
                 DisplayOutput "Browsers" "FireFox-Version" "$firefoxVersion"
 
                 # Edge
-                $EdgeInstalled= Test-Path -Path "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" -PathType Leaf
+                
+                # Edge Installed 
+                try {$EdgeInstalled= Test-Path -Path "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" -PathType Leaf}
+                catch { $EdgeInstalled = "unknown" }
                 DisplayOutput "Browsers" "EdgeInstalled" "$EdgeInstalled"
 
-                $error.clear()
+                # Edge Version 
                 try { $msedgeVersion=(Get-Item (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\msedge.exe' -ErrorAction SilentlyContinue).'(Default)').VersionInfo.ProductVersion }
                 catch { $msedgeVersion="unknown" }
                 DisplayOutput "Browsers" "MsEdge-Version" "$msedgeVersion"
                 
                 # IE
-                $IEInstalled=Test-Path -Path "C:\Program Files\Internet Explorer\iexplore.exe " -PathType Leaf
+                # IE Installed  
+                try {$IEInstalled=Test-Path -Path "C:\Program Files\Internet Explorer\iexplore.exe " -PathType Leaf}
+                catch { $IEInstalled = "unknown"}
                 DisplayOutput "Browsers" "IEInstalled" "$IEInstalled"
 
-                $error.clear()
+                # IE Version
                 try {$ieVersion=(Get-Item (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\iexplore.exe' -ErrorAction SilentlyContinue).'(Default)' -ErrorAction SilentlyContinue).VersionInfo.ProductVersion } 
                 catch { $ieVersion="unknown" }
                 DisplayOutput "Browsers" "IE-Version" "$ieVersion"
@@ -165,27 +191,34 @@ function EnumerateEachMachine
 
                 
                 # Check AV Products
-                # I'm not entirely convinced the AV scripts do much, so there might be some duplication with the fields below until I choose when function to use. These work for defender but probably not third party AV 
-                $AVEnabled2=(Get-MpComputerStatus -ErrorAction SilentlyContinue).AntivirusEnabled
+                
+                # AV Enabled
+                try {$AVEnabled2=(Get-MpComputerStatus -ErrorAction SilentlyContinue).AntivirusEnabled}
+                catch { $AVEnabled2 = "unknown" }
                 DisplayOutput "AV" "Enabled2" "$AVEnabled2"
-
-                $AVOnAccess=(Get-MpComputerStatus -ErrorAction SilentlyContinue).OnAccessProtectionEnabled
+                
+                # AV On Access Enabled 
+                try {$AVOnAccess=(Get-MpComputerStatus -ErrorAction SilentlyContinue).OnAccessProtectionEnabled}
+                catch { $AVOnAccess = "unknown" }   
                 DisplayOutput "AV" "OnAccess" "$AVOnAccess"
 
-                $AVRealTimeProtectionEnabled=(Get-MpComputerStatus -ErrorAction SilentlyContinue).RealTimeProtectionEnabled 
+                # AV Real Time PRotection Enabled 
+                try {$AVRealTimeProtectionEnabled=(Get-MpComputerStatus -ErrorAction SilentlyContinue).RealTimeProtectionEnabled }
+                catch { $AVRealTimeProtectionEnabled = "unknown" }
                 DisplayOutput "AV" "RealTimeProtectionEnabled" "$AVRealTimeProtectionEnabled"
 
-                $AVSignatureAge=(Get-MpComputerStatus -ErrorAction SilentlyContinue).AntivirusSignatureAge 
+                # AV Signature Age 
+                try { $AVSignatureAge=(Get-MpComputerStatus -ErrorAction SilentlyContinue).AntivirusSignatureAge }
+                catch { $AVSignatureAge = "unknown" }
+
+
                 DisplayOutput "AV" "SignatureAge" "$AVSignatureAge"
 
-
                 DisplayOutputAlt
-                # Handy command but not ready to impliment, check if Applocker policy is working command! 
-
                 
 
 
-                
+           
  };
 
 }
