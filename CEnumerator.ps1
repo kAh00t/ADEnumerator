@@ -25,7 +25,7 @@
 
 # Table Columns:    CME    windowsVersion    windowsEdition    ipAddress    CurrentDomain    computerName    defaultGateway    osSupported    LastGPOAppliedTime    lastSecurityUpdate    LocalGuestAccountEnabled    LocalAdmins    FirewallServiceRunning    firewallStatusDomain    firewallStatusPrivate    firewallStatusPublic    ChromeInstalled    chromeVersion    FirefoxInstalled    firefoxVersion    EdgeInstalled    msedgeVersion    IEInstalled    ieVersion    AVEnabled2    AVOnAccess    AVRealTimeProtectionEnabled    AVSignatureAge    
 
-# Function to write out variables to console
+# Function to write out variables to console (not currently in use)
 function DisplayOutput {
 	    param([String]$grouping,[String]$category,[String]$output) 
        # Write-Host ">>> ${CurrentDomain}:${computerName}:${ipAddress}:${grouping}:${category}:${output}"
@@ -34,7 +34,7 @@ function DisplayOutput {
 
 function DisplayOutputAlt {
     # Write-Host "+++ windowsVersion^windowsEdition^ipAddress^CurrentDomain^computerName^defaultGateway^osSupported^LastGPOAppliedTime^lastSecurityUpdate^LocalGuestAccountEnabled^LocalAdmins^FirewallServiceRunning^firewallStatusDomain^firewallStatusPrivate^firewallStatusPublic^ChromeInstalled^chromeVersion^FirefoxInstalled^firefoxVersion^EdgeInstalled^msedgeVersion^IEInstalled^ieVersion^AVEnabled2^AVOnAccess^AVRealTimeProtectionEnabled^AVSignatureAge"    
-    Write-Host "`t+++`tcomputerName`twindowsVersion`twindowsEdition`tipAddress`tCurrentDomain`t defaultGateway`t osSupported`t LastGPOAppliedTime`t lastSecurityUpdate`t localGuestAccountEnabled`t LocalAdmins`t FirewallServiceRunning`t firewallStatusDomain`t firewallStatusPrivate`t firewallStatusPublic`t ChromeInstalled`t chromeVersion`t FirefoxInstalled`t firefoxVersion`t EdgeInstalled`t msedgeVersion`t IEInstalled`t ieVersion`t AVEnabled2`t AVOnAccess`t AVRealTimeProtectionEnabled`tAVSignatureAge`t"
+    Write-Host "`t+++`tcomputerName`twindowsVersion`twindowsEdition`tipAddress`tCurrentDomain`tDefaultGateway`tOS-Supported`tLastGPOAppliedTime`tLastSecurityUpdateApplied`tLocalGuestAccountEnabled`tLocalAdmins`tFirewallServiceRunning`tFirewallStatusDomain`tFirewallStatusPrivate`tFirewallStatusPublic`tChromeInstalled`tChromeVersion`tFirefoxInstalled`tFirefoxVersion`tEdgeInstalled`tEdgeVersion`tIEInstalled`tIEVersion`tAVEnabled2`tAVOnAccess`tAVRealTimeProtectionEnabled`tAVSignatureAge`t"
     Write-Host "`t+++`t${computerName}`t${windowsVersion}`t${windowsEdition}`t${ipAddress}`t${CurrentDomain}`t${defaultGateway}`t${osSupported}`t${LastGPOAppliedTime}`t${lastSecurityUpdate}`t${localGuestAccountEnabled}`t${LocalAdmins}`t${FirewallServiceRunning}`t${firewallStatusDomain}`t${firewallStatusPrivate}`t${firewallStatusPublic}`t${ChromeInstalled}`t${chromeVersion}`t${FirefoxInstalled}`t${firefoxVersion}`t${EdgeInstalled}`t${msedgeVersion}`t${IEInstalled}`t${ieVersion}`t${AVEnabled2}`t${AVOnAccess}`t${AVRealTimeProtectionEnabled}`t${AVSignatureAge}`t"
 
 } 
