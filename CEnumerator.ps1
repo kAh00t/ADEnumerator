@@ -35,8 +35,8 @@ function DisplayOutput {
 
 function DisplayOutputAlt {
     # Write-Host "+++ WindowsVersion^windowsEdition^ipAddress^CurrentDomain^computerName^defaultGateway^osSupported^LastGPOAppliedTime^lastSecurityUpdate^LocalGuestAccountEnabled^LocalAdmins^FirewallServiceRunning^firewallStatusDomain^firewallStatusPrivate^firewallStatusPublic^ChromeInstalled^chromeVersion^FirefoxInstalled^firefoxVersion^EdgeInstalled^msedgeVersion^IEInstalled^ieVersion^AVEnabled2^AVOnAccess^AVRealTimeProtectionEnabled^AVSignatureAge"    
-    Write-Host "`t+++`tComputerName`tWindowsVersion`tWindowsEdition`tIPv4-Address`tCurrentDomain`tDefaultGateway`tOS-Supported`tLastGPOAppliedTime`tLastSecurityUpdateApplied`tLocalGuestAccountEnabled`tLocalAdmins`tFirewallServiceRunning`tFirewallStatusDomain`tFirewallStatusPrivate`tFirewallStatusPublic`tChromeInstalled`tChromeVersion`tFirefoxInstalled`tFirefoxVersion`tEdgeInstalled`tEdgeVersion`tIEInstalled`tIEVersion`tAVEnabled2`tAVOnAccess`tAVRealTimeProtectionEnabled`tAVSignatureAge`t"
-    Write-Host "`t+++`t${computerName}`t${windowsVersion}`t${windowsEdition}`t${ipAddress}`t${CurrentDomain}`t${defaultGateway}`t${osSupported}`t${LastGPOAppliedTime}`t${lastSecurityUpdate}`t${localGuestAccountEnabled}`t${LocalAdmins}`t${FirewallServiceRunning}`t${firewallStatusDomain}`t${firewallStatusPrivate}`t${firewallStatusPublic}`t${ChromeInstalled}`t${chromeVersion}`t${FirefoxInstalled}`t${firefoxVersion}`t${EdgeInstalled}`t${msedgeVersion}`t${IEInstalled}`t${ieVersion}`t${AVEnabled2}`t${AVOnAccess}`t${AVRealTimeProtectionEnabled}`t${AVSignatureAge}`t"
+    Write-Host "`t+++`tComputerName`tWindowsVersion`tWindowsEdition`tIPv4-Address`tCurrentDomain`tDefaultGateway`tOS-Supported`tLastGPOAppliedTime`tLastSecurityUpdateApplied`tLocalGuestAccountEnabled`tLocalAdmins`tFirewallServiceRunning`tFirewallStatusDomain`tFirewallStatusPrivate`tFirewallStatusPublic`tChromeInstalled`tChromeVersion`tFirefoxInstalled`tFirefoxVersion`tEdgeInstalled`tEdgeVersion`tIEInstalled`tIEVersion`tAVEnabled2`tAVOnAccess`tAVRealTimeProtectionEnabled`tAVSignatureAge`tIPv6-Enabled`tldapSigningStatus`tSMB_EncryptionEnabled`tSMB_SigningEnabled"
+    Write-Host "`t+++`t${computerName}`t${windowsVersion}`t${windowsEdition}`t${ipAddress}`t${CurrentDomain}`t${defaultGateway}`t${osSupported}`t${LastGPOAppliedTime}`t${lastSecurityUpdate}`t${localGuestAccountEnabled}`t${LocalAdmins}`t${FirewallServiceRunning}`t${firewallStatusDomain}`t${firewallStatusPrivate}`t${firewallStatusPublic}`t${ChromeInstalled}`t${chromeVersion}`t${FirefoxInstalled}`t${firefoxVersion}`t${EdgeInstalled}`t${msedgeVersion}`t${IEInstalled}`t${ieVersion}`t${AVEnabled2}`t${AVOnAccess}`t${AVRealTimeProtectionEnabled}`t${AVSignatureAge}`t{$ipv6EnabledStatus}`t$ldapSigningStatus`t{$SMB_EncryptionEnabled}`t{$SMB_SigningEnabled}"
 
 } 
 
@@ -181,6 +181,20 @@ function EnumerateEachMachine
              try { $AVSignatureAge=(Get-MpComputerStatus -ErrorAction SilentlyContinue).AntivirusSignatureAge }
              catch { $AVSignatureAge = "unknown" }
 
+
+
+             # Addtional (out of scope of CE, could be useful for pentesting?)
+             try {Get-NetIPInterface -ErrorAction SilentlyContinue | where AddressFamily -in "IPv6" | select DHCP | where DHCP -Contains Enabled; If ($ipv6Enabled -ne $empty) {$ipv6EnabledStatus = 1} Else {$ipv6EnabledStatus = 0};}
+             catch { $ipv6EnabledStatus = "unknown"}
+
+             try {$ldapSigningStatus = (Get-ItemProperty -path 'HKLM:\SYSTEM\CurrentControlSet\Services\LDAP' -ErrorAction SilentlyContinue).LdapclientIntegrity}
+             catch { $ldapSigningStatus = "unknown" }
+
+             try {$SMB_EncryptionEnabled = (Get-SmbServerConfiguration -ErrorAction SilentlyContinue | select EncryptData).EncryptData}
+             catch {$SMB_EncryptionEnabled = "unknown"} 
+
+             try {$SMB_SigningEnabled = (Get-SmbServerConfiguration -ErrorAction SilentlyContinue | select RequireSecuritySignature).requiresecuritysignature }
+             catch {$SMB_SigningEnabled = "unknown"}
 
              DisplayOutputAlt
              
