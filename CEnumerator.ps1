@@ -9,18 +9,19 @@
 # powershell.exe -exec Bypass -C "IEX (New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/kAh00t/ADEnumerator/main/CEnumerator.ps1')"
 # OR
 # crackmapexec smb 192.168.123.0/24 -u 'USERNAME' -p 'PASSWORD' -x "powershell.exe -exec Bypass -C \"IEX (New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/kAh00t/ADEnumerator/main/CEnumerator.ps1')\"" | tee cmeoutput.txt
+# crackmapexec smb 192.168.123.0/24 -u 'USERNAME' -p 'PASSWORD' -x "powershell.exe -exec Bypass -C \"IEX (New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/kAh00t/ADEnumerator/main/CEnumerator.ps1')\"" | tee cmeoutput.txt
 
 # OR
 
 # crackmapexec smb alive-windowsmachines.txt -u 'username' -p 'password' -X "IEX (New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/kAh00t/ADEnumerator/main/CEnumerator.ps1')" | tee output.txt
 
 # Parse and remove weird encoding string issue I've not worked out 
-# cat cmeoutput.txt | grep ">>>" | cut -d ">" -f 4 | sed -e 's/\[0m//' >> excel-parsed.csv
+# cat cmeoutput.txt | grep "+++" | cut -d ">" -f 4 | sed "s,\x1B\[[0-9;]*[a-zA-Z],,g" | cut --complement -f1 | sort | uniq | tee excel.csv
 
-
-# sed -i '1s/^/    CME    windowsVersion        windowsEdition  ipAddress       CurrentDomain   computerName    defaultGateway  osSupported     LastGPOAppliedTime    lastSecurityUpdate    LocalGuestAccountEnabled    LocalAdmins    FirewallServiceRunning    firewallStatusDomain    firewallStatusPrivate    firewallStatusPublic    ChromeInstalled    chromeVersion    FirefoxInstalled    firefoxVersion    EdgeInstalled    msedgeVersion    IEInstalled    ieVersion    AVEnabled2    AVOnAccess    AVRealTimeProtectionEnabled    AVSignatureAge    /' output.txt
-# Open the parsed file, remember to choose : as delimeter. 
 # libreoffice excel-parsed.csv 
+
+
+# /usr/bin/impacket-wmiexec weegiecast.inc/david.manuel:Fuzz_sh1\!@workstation3 "cmd.exe /c powershell.exe -nop -enc SQBFAFgAIAAoAE4AZQB3AC0ATwBiAGoAZQBjAHQAIABOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkALgBEAG8AdwBuAGwAbwBhAGQAUwB0AHIAaQBuAGcAKAAnAGgAdAB0AHAAcwA6AC8ALwByAGEAdwAuAGcAaQB0AGgAdQBiAHUAcwBlAHIAYwBvAG4AdABlAG4AdAAuAGMAbwBtAC8AawBBAGgAMAAwAHQALwBBAEQARQBuAHUAbQBlAHIAYQB0AG8AcgAvAG0AYQBpAG4ALwBDAEUAbgB1AG0AZQByAGEAdABvAHIALgBwAHMAMQAnACkACgA=" > wmiexecoutput.txt
 
 
 # Table Columns:    CME    windowsVersion    windowsEdition    ipAddress    CurrentDomain    computerName    defaultGateway    osSupported    LastGPOAppliedTime    lastSecurityUpdate    LocalGuestAccountEnabled    LocalAdmins    FirewallServiceRunning    firewallStatusDomain    firewallStatusPrivate    firewallStatusPublic    ChromeInstalled    chromeVersion    FirefoxInstalled    firefoxVersion    EdgeInstalled    msedgeVersion    IEInstalled    ieVersion    AVEnabled2    AVOnAccess    AVRealTimeProtectionEnabled    AVSignatureAge    
@@ -34,7 +35,7 @@ function DisplayOutput {
 
 function DisplayOutputAlt {
     # Write-Host "+++ windowsVersion^windowsEdition^ipAddress^CurrentDomain^computerName^defaultGateway^osSupported^LastGPOAppliedTime^lastSecurityUpdate^LocalGuestAccountEnabled^LocalAdmins^FirewallServiceRunning^firewallStatusDomain^firewallStatusPrivate^firewallStatusPublic^ChromeInstalled^chromeVersion^FirefoxInstalled^firefoxVersion^EdgeInstalled^msedgeVersion^IEInstalled^ieVersion^AVEnabled2^AVOnAccess^AVRealTimeProtectionEnabled^AVSignatureAge"    
-    Write-Host "`t+++`tcomputerName`twindowsVersion`twindowsEdition`tipAddress`tCurrentDomain`tDefaultGateway`tOS-Supported`tLastGPOAppliedTime`tLastSecurityUpdateApplied`tLocalGuestAccountEnabled`tLocalAdmins`tFirewallServiceRunning`tFirewallStatusDomain`tFirewallStatusPrivate`tFirewallStatusPublic`tChromeInstalled`tChromeVersion`tFirefoxInstalled`tFirefoxVersion`tEdgeInstalled`tEdgeVersion`tIEInstalled`tIEVersion`tAVEnabled2`tAVOnAccess`tAVRealTimeProtectionEnabled`tAVSignatureAge`t"
+    Write-Host "`t+++`tComputerName`tWindowsVersion`tWindowsEdition`tIPv4-Address`tCurrentDomain`tDefaultGateway`tOS-Supported`tLastGPOAppliedTime`tLastSecurityUpdateApplied`tLocalGuestAccountEnabled`tLocalAdmins`tFirewallServiceRunning`tFirewallStatusDomain`tFirewallStatusPrivate`tFirewallStatusPublic`tChromeInstalled`tChromeVersion`tFirefoxInstalled`tFirefoxVersion`tEdgeInstalled`tEdgeVersion`tIEInstalled`tIEVersion`tAVEnabled2`tAVOnAccess`tAVRealTimeProtectionEnabled`tAVSignatureAge`t"
     Write-Host "`t+++`t${computerName}`t${windowsVersion}`t${windowsEdition}`t${ipAddress}`t${CurrentDomain}`t${defaultGateway}`t${osSupported}`t${LastGPOAppliedTime}`t${lastSecurityUpdate}`t${localGuestAccountEnabled}`t${LocalAdmins}`t${FirewallServiceRunning}`t${firewallStatusDomain}`t${firewallStatusPrivate}`t${firewallStatusPublic}`t${ChromeInstalled}`t${chromeVersion}`t${FirefoxInstalled}`t${firefoxVersion}`t${EdgeInstalled}`t${msedgeVersion}`t${IEInstalled}`t${ieVersion}`t${AVEnabled2}`t${AVOnAccess}`t${AVRealTimeProtectionEnabled}`t${AVSignatureAge}`t"
 
 } 
